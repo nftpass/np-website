@@ -5,8 +5,8 @@ import { BrowserRouter as Router } from "react-router-dom";
 import BlockchainContext from "./Context/BlockchainContext";
 import Routes from "./Routes";
 import { Button, Container, Nav, Navbar } from "react-bootstrap";
-
 import ReactGA from "react-ga4";
+import { Helmet } from "react-helmet";
 
 ReactGA.initialize("G-TWE1F7Y03G");
 
@@ -56,6 +56,15 @@ class App extends Component {
     }
     return (
       <div className="App">
+        <Helmet>
+          <meta charSet="utf-8" />
+          <title>Nftpass — your wallet score and rank</title>
+          <link rel="canonical" href="https://nftpass.xyz/" />
+          <meta
+            name="description"
+            content="Find out your wallet score and rank. Mint NFT with a proof. Brag about it."
+          />
+        </Helmet>
         <Router>
           <BlockchainContext.Provider value={{ balance, web3, accounts }}>
             <Navbar
