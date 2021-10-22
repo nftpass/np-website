@@ -51,7 +51,7 @@ class App extends Component {
                   <Navbar.Toggle aria-controls="basic-navbar-nav" />
                   <Navbar.Collapse id="basic-navbar-nav">
                     <Nav>
-                        <Nav.Link style={{color: 'black'}} className='navlink' href="/">App</Nav.Link>
+                        <Nav.Link style={{color: 'black'}} className='navlink' href="/app">App</Nav.Link>
                         <Nav.Link style={{color: 'black'}} className='navlink' href="/">DAO</Nav.Link>
                         <Nav.Link style={{color: 'black'}} className='navlink' href="/">Docs</Nav.Link>
                     </Nav>
