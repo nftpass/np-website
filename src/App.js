@@ -58,7 +58,7 @@ class App extends Component {
                     <Nav className='ml-auto' style={{borderRadius: '0.7rem', border: '0.1px solid black'}}>
                       { this.connected ? 
                         <Navbar.Text style={{padding: '10px', color: 'black'}}>{accounts[0]}</Navbar.Text>
-                        : <Button className='border-0' style={{backgroundColor: 'rgba(0, 0, 0, 0)', color: 'black'}} onClick={() => { this.connectWeb3()}}>Connect To MetaMask</Button>
+                        : <Button className='border-0 transparent' style={{color: 'black'}} onClick={() => { this.connectWeb3()}}>Connect</Button>
                       }
                     </Nav>
                   </Navbar.Collapse>

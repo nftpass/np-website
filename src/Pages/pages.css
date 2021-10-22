@@ -4,3 +4,7 @@
 .coloredreverse {
     background: linear-gradient(to right, rgba(200, 30, 200, 0.7), rgba(30, 150, 250, 0.7));
 }
+
+.transparent {
+    background-color: rgba(0, 0, 0, 0);
+}

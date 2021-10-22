@@ -12,17 +12,16 @@ export class Home extends Component {
             <Container style={{textAlign: "left"}} fluid>
                 <Row className="justify-content-center align-items-center">
                     <Col xs={{span: 12, order: 2}} lg={{span: 6, order: 1}}>
-                        <div className="p-5" style={{borderStyle: "none"}}>
-                            <h1>NFTPass</h1>
-                            <Button className='border-0 coloredreverse' href="/signup">Get Started</Button>
+                        <div style={{borderStyle: "none", padding: '20%'}}>
+                            <h1 style={{ fontSize: '5vh', padding: '10px' }}>NFTPass</h1>
+                            <h2 style={{ padding: '10px' }}>Connect 🔌your wallet and 🔮 find out your 💎score! </h2>
+                            <div style={{ padding: '10px' }}>
+                                <Button className='transparent' style={{borderRadius: '0.7rem', border: '1px solid black', color: 'black', marginRight: '10px'}} href="/">Get My Score</Button>
+                                <Button className='transparent' style={{borderRadius: '0.7rem', border: '1px solid black', color: 'black'}} href="/">Read the docs</Button>
+                            </div>
                         </div>
                     </Col>
                     <Col xs={{span: 12, order: 1}} lg={{span: 4, order: 2}}>
-                        <div className="p-5">
-                        <video autoPlay muted loop style={{maxWidth: '90%'}}>
-                            <source src="coinflip.mp4" type="video/mp4"/>
-                        </video>
-                        </div>
                     </Col>
                 </Row>
             </Container>
