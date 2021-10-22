@@ -1,0 +1,6 @@
+.colored {
+    background: linear-gradient(to right, rgba(30, 150, 250, 0.7), rgba(200, 30, 200, 0.7));
+}
+.coloredreverse {
+    background: linear-gradient(to right, rgba(200, 30, 200, 0.7), rgba(30, 150, 250, 0.7));
+}
