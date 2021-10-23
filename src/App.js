@@ -75,21 +75,14 @@ class App extends Component {
               <Container fluid>
                 <Navbar.Brand href="/">
                   <img
-                    src="logo.svg"
-                    style={{ width: 50, height: "auto" }}
+                    src="logowithtext.svg"
+                    style={{ height: "2em" }}
                     alt=""
                   />
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                  <Nav>
-                    <Nav.Link
-                      style={{ color: "black" }}
-                      className="navlink"
-                      href="/app"
-                    >
-                      App
-                    </Nav.Link>
+                  <Nav className="ml-auto">
                     <Nav.Link
                       style={{ color: "black" }}
                       className="navlink"
@@ -102,11 +95,18 @@ class App extends Component {
                       className="navlink"
                       href="/"
                     >
+                      FAQ
+                    </Nav.Link>
+                    <Nav.Link
+                      style={{ color: "black" }}
+                      className="navlink"
+                      href="/"
+                    >
                       Docs
                     </Nav.Link>
                   </Nav>
-                  <Nav
-                    className="ml-auto"
+                  {/* <Nav
+                    className="mr-auto"
                     style={{
                       borderRadius: "0.7rem",
                       border: "0.1px solid black",
@@ -127,7 +127,7 @@ class App extends Component {
                         Connect
                       </Button>
                     )}
-                  </Nav>
+                  </Nav> */}
                 </Navbar.Collapse>
               </Container>
             </Navbar>
