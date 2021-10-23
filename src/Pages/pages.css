@@ -1,10 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
 
 .colored {
-    background: linear-gradient(to right, rgba(30, 150, 250, 0.7), rgba(200, 30, 200, 0.7));
+    background: linear-gradient(
+        to right,
+        rgba(30, 150, 250, 0.7),
+        rgba(200, 30, 200, 0.7)
+    );
 }
 .coloredreverse {
-    background: linear-gradient(to right, rgba(200, 30, 200, 0.7), rgba(30, 150, 250, 0.7));
+    background: linear-gradient(
+        to right,
+        rgba(200, 30, 200, 0.7),
+        rgba(30, 150, 250, 0.7)
+    );
 }
 
 .transparent {
@@ -18,4 +26,20 @@
     transform: translate(-50%, -30%);
     text-align: center;
     min-width: 100%;
+}
+
+.pepe {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    max-width: 20%;
+}
+
+@media only screen and (min-width: 768px) {
+    .pepe {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        max-width: 50%;
+    }
 }
