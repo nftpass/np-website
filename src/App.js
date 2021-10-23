@@ -4,7 +4,7 @@ import Web3 from "web3";
 import { BrowserRouter as Router } from "react-router-dom";
 import BlockchainContext from "./Context/BlockchainContext";
 import Routes from "./Routes";
-import { Button, Container, Nav, Navbar } from "react-bootstrap";
+import { Container, Nav, Navbar } from "react-bootstrap";
 import ReactGA from "react-ga4";
 import { Helmet } from "react-helmet";
 
@@ -24,27 +24,6 @@ class App extends Component {
 
   componentDidMount() {
     ReactGA.send("pageview");
-  }
-
-  async connectWeb3() {
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const balance = this.state.web3.utils.fromWei(
-          await this.state.web3.eth.getBalance(accounts[0])
-        );
-        this.state.web3.eth.net.getId().then((networkId) => {
-          this.setState({ networkId });
-        });
-        this.setState({ accounts, balance });
-      } catch (error) {
-        if (error.code === 4001) {
-        }
-        console.log(error);
-      }
-    }
   }
 
   render() {
@@ -70,7 +49,7 @@ class App extends Component {
             <Navbar
               variant="dark"
               expand="lg"
-              style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
+              style={{ backgroundColor: "rgba(0, 0, 0, 0)", height:'5em' }}
             >
               <Container fluid>
                 <Navbar.Brand href="/">
