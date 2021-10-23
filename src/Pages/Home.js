@@ -67,21 +67,6 @@ export class Home extends Component {
         }
     }
 
-    async getScoreFromDB (db, address) {
-        try {
-            const starCountRef = ref(db, 'score/' + address);
-            onValue(starCountRef, async (snapshot) => {
-                const data = await snapshot.val();
-
-                this.setState({scores: data}, () => {
-                    console.log(this.state.scores)
-                })
-            });
-        } catch (e) {
-            throw new Error();
-        }
-    }
-
     async getScore(metamask) {
         try {
             this.setState({scoreProgress: 'progress', loaderText: 'Connecting to web3'})
