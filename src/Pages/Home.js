@@ -75,7 +75,7 @@ export class Home extends Component {
     }
     async mintNFTPass () {
         try {
-            this.setState({scoreProgress: 'minted', loaderText: 'We are minting your NFT...'})
+            this.setState({scoreProgress: 'progress', loaderText: 'We are minting your NFT...'})
             const signature = await fetch(`https://nftpass.herokuapp.com/sign/${this.state.accounts[0]}`)
             .then((res) => res.json());
             await this.state.contract.methods.mint(signature.messageHash, signature.signature, signature.nonce, signature.score)
