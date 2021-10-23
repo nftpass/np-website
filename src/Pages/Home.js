@@ -148,7 +148,7 @@ export class Home extends Component {
                         {
                             this.state.scoreProgress == 'score' && 
                             <div id='app' style={{borderStyle: "none", paddingTop: '10%'}}>
-                                <Minter mint={this.mintNFTPass} scores={this.state.scores}/>
+                                <Minter mint={this.mintNFTPass} scores={this.state && this.state.scores}/>
                             </div>
                         }
                                                 {
