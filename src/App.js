@@ -49,7 +49,7 @@ class App extends Component {
             <Navbar
               variant="dark"
               expand="lg"
-              style={{ backgroundColor: "rgba(0, 0, 0, 0)", height:'5em' }}
+              style={{ backgroundColor: "rgba(0, 0, 0, 0)", height: "5em" }}
             >
               <Container fluid>
                 <Navbar.Brand href="/">
@@ -65,23 +65,16 @@ class App extends Component {
                     <Nav.Link
                       style={{ color: "black" }}
                       className="navlink"
-                      href="/"
+                      href="https://github.com/nftpass/"
                     >
-                      DAO
+                      Github
                     </Nav.Link>
                     <Nav.Link
                       style={{ color: "black" }}
                       className="navlink"
-                      href="/"
+                      href="https://github.com/nftpass/smart-contracts"
                     >
-                      FAQ
-                    </Nav.Link>
-                    <Nav.Link
-                      style={{ color: "black" }}
-                      className="navlink"
-                      href="/"
-                    >
-                      Docs
+                      Contract
                     </Nav.Link>
                   </Nav>
                   {/* <Nav
