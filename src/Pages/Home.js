@@ -98,12 +98,12 @@ export class Home extends Component {
             await response.json()
             .then(async (res) => {
                 if(res.success) {
-                    await this.getScoreFromDB(this.state.database, this.state.accounts[0])
-                    .then(() => {
+                    const starCountRef = ref(this.state.database, 'score/' + this.state.accounts[0]);
+                    onValue(starCountRef, async (snapshot) => {
+                        const data = await snapshot.val();
+                        this.setState({scores: data})
                         setTimeout(() => { this.setState({scoreProgress: 'score'}) }, 1000)
-                    })
-                    console.log(this.state.scores)
-
+                    });
                 } else {
                     throw new Error()
                 }
