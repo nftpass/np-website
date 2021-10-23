@@ -48,9 +48,6 @@ export class Home extends Component {
             const accounts = await window.ethereum.request({
               method: "eth_requestAccounts",
             });
-            const balance = this.state.web3.utils.fromWei(
-              await this.state.web3.eth.getBalance(accounts[0])
-            );
             this.state.web3.eth.net.getId().then(async (networkId) => {
                 console.log(networkId)
               
@@ -81,7 +78,7 @@ export class Home extends Component {
                     throw new Error();
                 }
             })
-            const response = await fetch('https://chat.kesarx.repl.co/score')
+            const response = await fetch(`https://nftpass.herokuapp.com/get_score/${this.state.accounts[0]}`)
             await response
             .json()
             .then((scores) => {
@@ -91,26 +88,16 @@ export class Home extends Component {
             this.setState({scoreProgress: 'error'})
         }
     }
-
-    between(min, max) {  
-        return Math.floor(
-          Math.random() * (max - min) + min
-        )
-    }
-
     async mintNFTPass () {
         this.setState({scoreProgress: 'progress', loaderText: 'We are minting your NFT...'})
-        const nonce = this.between(0, Number.MAX_SAFE_INTEGER)
-        const score = this.between(0, Number.MAX_SAFE_INTEGER)
-        let hashMessage = this.state.web3.utils.soliditySha3(this.state.accounts[0], score, nonce)
-        console.log(hashMessage)
-        let signature = this.state.web3.eth.accounts.sign(hashMessage, PRIVATE_KEY)
-        console.log(signature.messageHash, signature.signature)
-        await this.state.contract.methods.mint(signature.messageHash, signature.signature, nonce, score)
-            .send({ from: this.state.accounts[0], value: 0 })
-            .then((res) => {
-                console.log(res)
-            })
+        const signature = await fetch(`https://nftpass.herokuapp.com/sign/${this.state.accounts[0]}`)
+        .then((res) => res.json());
+        console.log(signature)
+        // await this.state.contract.methods.mint(signature.messageHash, signature.signature, nonce, score)
+        //     .send({ from: this.state.accounts[0], value: 0 })
+        //     .then((res) => {
+        //         console.log(res)
+        //     })
 
 
         // const canvas = createCanvas(256, 256);
