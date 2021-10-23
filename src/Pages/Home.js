@@ -10,16 +10,6 @@ export class Home extends Component {
         super()
         this.state = {
             scoreProgress: 'start',
-            phrases: [
-                'Counting NFTs',
-                'Looking into wallet history',
-                'Counting collections',
-                'Valuating collection',
-                'Calculate ranking',
-                'Checking diamond hands',
-                'Asking reputable DAOs',
-                'Checking POAPs'
-            ],
             count: 0,
             loaderText: null,
             scores: null,
@@ -84,14 +74,20 @@ export class Home extends Component {
         }
     }
     async mintNFTPass () {
-        this.setState({scoreProgress: 'progress', loaderText: 'We are minting your NFT...'})
-        const signature = await fetch(`https://nftpass.herokuapp.com/sign/${this.state.accounts[0]}`)
-        .then((res) => res.json());
-        await this.state.contract.methods.mint(signature.messageHash, signature.signature, signature.nonce, signature.score)
-            .send({ from: this.state.accounts[0], value: 0 })
-            .then((res) => {
-                console.log(res)
-            })
+        try {
+            this.setState({scoreProgress: 'minted', loaderText: 'We are minting your NFT...'})
+            const signature = await fetch(`https://nftpass.herokuapp.com/sign/${this.state.accounts[0]}`)
+            .then((res) => res.json());
+            await this.state.contract.methods.mint(signature.messageHash, signature.signature, signature.nonce, signature.score)
+                .send({ from: this.state.accounts[0], value: 0 })
+                .then((res) => {
+                    this.setState({txHash: res.transactionHash, scoreProgress: 'minted'})
+                })
+        } catch (error) {
+            this.setState({scoreProgress: 'error'})
+            console.log(error)
+        }
+
 
 
         // const canvas = createCanvas(256, 256);
@@ -236,9 +232,25 @@ export class Home extends Component {
                         {
                             this.state.scoreProgress == 'minted' && 
                             <div id='app' style={{borderStyle: "none", paddingTop: '10%'}}>
-                                <Container>
-                                    <h1>Minted</h1>
-                                    <h4>Your personal NFTPASS score has been minted!</h4>
+                                <Container className='justify-content-center' style={{justifyContent: 'center'}}>
+                                    <Row className='align-items-center'>
+                                        <div style={{ position: 'relative', textAlign: 'center'}}>
+                                            <img style={{minWidth: '100%', height: 'auto', border: '5px solid black'}} src='frame.png'/>
+                                            <div className="imagecenter align-items-center">
+                                                <img src='logo.svg' width='20%' />
+                                                <h1 style={{ fontFamily: 'Inter', fontWeight: '700'}}></h1>
+                                                <p style={{ fontFamily: 'Inter', fontWeight: '700'}}>points</p>
+                                                <p style={{ fontFamily: 'Inter', fontWeight: '700', padding: '0px'}}>TOP %</p>
+                                            </div>
+                                            <h6 className='fixed-bottom' style={{position: "absolute", bottom: '3px', fontFamily: 'Inter', fontWeight: '700', fontSize: '0.7em'}}>NFTPASS.XYZ</h6>
+                                        </div>
+                                    </Row>
+                                    <Row style={{ paddingTop: '5%', textAlign: 'center'}}>
+                                        <a className='border-0 w-100' style={{borderRadius: '0rem', backgroundColor: 'rgb(0,0,0)', color: 'white', fontFamily: 'Inter', fontWeight: '700', padding: '10px 20px 10px 20px'}} href={`https://rinkeby.etherscan.io/tx/${this.state.txHash}`}>View on Etherscan ↗</a>
+                                    </Row>
+                                    <Row style={{ paddingTop: '5%', textAlign: 'center'}}>
+                                        <a className='border-0 w-100' style={{borderRadius: '0rem', backgroundColor: 'rgb(0,0,0)', color: 'white', fontFamily: 'Inter', fontWeight: '700', padding: '10px 20px 10px 20px'}} href='https://opensea.io'>See in OpenSea ↗</a>
+                                    </Row>
                                 </Container>
                             </div>
                         }
@@ -283,11 +295,11 @@ function Minter (props) {
                         <Button style={{backgroundColor: 'rgba(0, 0, 0, 1)', borderRadius: '0', border: '0'}} className='w-100' onClick={props.mint}>Mint it!</Button>
                     </Row>
                 </Col>
-                <Col className='p-5'>
+                {/* <Col className='p-5'>
                     <Row style={{ textAlign: 'center', paddingTop: '10px'}}>
                         <h5 className='w-100'><a style={{textDecoration: 'none', color: "black", fontFamily: 'Inter', fontWeight: '700'}} href='/'>How do we calculate this?</a></h5>
                     </Row>
-                </Col>
+                </Col> */}
             </Row>
         </Container>
     )
