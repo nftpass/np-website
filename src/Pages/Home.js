@@ -87,103 +87,7 @@ export class Home extends Component {
             this.setState({scoreProgress: 'error'})
             console.log(error)
         }
-
-
-
-        // const canvas = createCanvas(256, 256);
-        // const ctx = canvas.getContext('2d');
-        // const background = await loadImage('/frame.png')
-        // ctx.drawImage(background, 0, 0, 256, 256);
-        // const image = canvas.toBuffer()
-        // console.log(image)
-
-        // this.pinFileToIPFS()
-        //     .then(async (res) => {
-        //         this.pinJSONToIPFS()
-        //             .then(async () => {
-        //                 const tokenURI = res
-        //             })
-        //     })
     }
-
-
-    pinFileToIPFS = (file) => {
-
-        //we gather a local file for this example, but any valid readStream source will work here.
-        let data = new FormData();
-        data.append('file', file);
-
-        //pinataOptions are optional
-        const pinataOptions = JSON.stringify({
-            cidVersion: 0,
-            customPinPolicy: {
-                regions: [
-                    {
-                        id: 'FRA1',
-                        desiredReplicationCount: 1
-                    },
-                    {
-                        id: 'NYC1',
-                        desiredReplicationCount: 2
-                    }
-                ]
-            }
-        });
-        data.append('pinataOptions', pinataOptions);
-
-        return axios
-            .post(`https://api.pinata.cloud/pinning/pinFileToIPFS`, data, {
-                maxBodyLength: 'Infinity', //this is needed to prevent axios from erroring out with large files
-                headers: {
-                    'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
-                    pinata_api_key: this.state.pinata_api_key,
-                    pinata_secret_api_key: this.state.pinata_secret_api_key
-                }
-            })
-            .then((response) => {
-                console.log(response.data.IpfsHash)
-                return response.data.IpfsHash;
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-    };
-    
-    pinJSONToIPFS = async (name, imageURL, description) => {
-        const JSONBody = {
-            pinataMetadata: {
-                name: name,
-            },
-            pinataContent: {
-                name: name,
-                description: description,
-                image: `https://gateway.pinata.cloud/ipfs/${imageURL}`,
-                attributes: [
-                    {
-                        "display_type": 'number',
-                        "trait_type": 'NFTPass Score',
-                        "value": 0,
-                        "max_value": 5
-                    }
-                ]
-            }
-        
-        }
-
-        return axios
-            .post(`https://api.pinata.cloud/pinning/pinJSONToIPFS`, JSONBody, {
-                headers: {
-                    pinata_api_key: this.state.pinata_api_key,
-                    pinata_secret_api_key: this.state.pinata_secret_api_key
-                }
-            })
-            .then((response) => {
-                return response.data.IpfsHash;
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-    };
 
     render () {
         return (
@@ -295,11 +199,6 @@ function Minter (props) {
                         <Button style={{backgroundColor: 'rgba(0, 0, 0, 1)', borderRadius: '0', border: '0'}} className='w-100' onClick={props.mint}>Mint it!</Button>
                     </Row>
                 </Col>
-                {/* <Col className='p-5'>
-                    <Row style={{ textAlign: 'center', paddingTop: '10px'}}>
-                        <h5 className='w-100'><a style={{textDecoration: 'none', color: "black", fontFamily: 'Inter', fontWeight: '700'}} href='/'>How do we calculate this?</a></h5>
-                    </Row>
-                </Col> */}
             </Row>
         </Container>
     )
