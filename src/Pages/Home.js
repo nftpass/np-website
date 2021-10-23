@@ -4,8 +4,6 @@ import './pages.css'
 import Web3 from "web3";
 import axios from 'axios';
 import NFTPass from '../contracts/NFTPassABI.json'
-require('dotenv').config()
-const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY;
 
 export class Home extends Component {
     constructor(){
@@ -39,7 +37,6 @@ export class Home extends Component {
         this.setState({contract: new this.state.web3.eth.Contract(NFTPass, '0x8d2De24678bD8BD2486f943b633a341E33FBd251')}, () => {
             console.log(this.state.contract)
         })
-        console.log(PRIVATE_KEY)
     }
 
     async connectWeb3() {
@@ -49,8 +46,6 @@ export class Home extends Component {
               method: "eth_requestAccounts",
             });
             this.state.web3.eth.net.getId().then(async (networkId) => {
-                console.log(networkId)
-              
               if(networkId !== 4) {
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
@@ -92,12 +87,11 @@ export class Home extends Component {
         this.setState({scoreProgress: 'progress', loaderText: 'We are minting your NFT...'})
         const signature = await fetch(`https://nftpass.herokuapp.com/sign/${this.state.accounts[0]}`)
         .then((res) => res.json());
-        console.log(signature)
-        // await this.state.contract.methods.mint(signature.messageHash, signature.signature, nonce, score)
-        //     .send({ from: this.state.accounts[0], value: 0 })
-        //     .then((res) => {
-        //         console.log(res)
-        //     })
+        await this.state.contract.methods.mint(signature.messageHash, signature.signature, signature.nonce, signature.score)
+            .send({ from: this.state.accounts[0], value: 0 })
+            .then((res) => {
+                console.log(res)
+            })
 
 
         // const canvas = createCanvas(256, 256);
