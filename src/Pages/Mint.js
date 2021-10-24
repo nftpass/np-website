@@ -33,7 +33,9 @@ export class MintNFTPass extends Component {
             },
             app: null,
             database: null,
-            text: ''
+            text: '',
+            pinata_api_key: '9abc6e0558f2d596f696',
+            pinata_secret_api_key: 'af50e53805c94dfa4b6bd3ddb85eadb5898704a5c17577b5651cf968e441cdec'
         }
         
     }
@@ -67,6 +69,8 @@ export class MintNFTPass extends Component {
                 ).then((res) => res.json());
                 if(balance == 0) {
                     this.setState({text: 'minting new nft', scoreProgress: "progress"})
+                    this.pinJSONToIPFS(this.state.scores)
+                        .then((res) => {console.log(`https://gateway.pinata.cloud/ipfs/${res}`)})
                         try {
                             await this.context.contract.methods
                                 .mint(
@@ -84,12 +88,12 @@ export class MintNFTPass extends Component {
                                 })
                                 .then(async () => {
                                     try {
-                                        this.pinFileToIPFS()
+                                        const metadata = this.pinJSONToIPFS(this.state.score)
+                                        console.log(metadata)
                                     } catch (error) {
                                         this.setState({ scoreProgress: "error" });
                                         console.log(error)
                                     }
-                                    
                                 })
                         } catch (error) {
                             this.setState({ scoreProgress: "error" });
@@ -166,20 +170,20 @@ export class MintNFTPass extends Component {
             });
     };
 
-    pinJSONToIPFS = async (name, imageURL, description) => {
+    pinJSONToIPFS = async (score) => {
         const JSONBody = {
             pinataMetadata: {
-                name: name,
+                name: 'NFTPass',
             },
             pinataContent: {
-                name: name,
-                description: description,
-                image: `https://gateway.pinata.cloud/ipfs/${imageURL}`,
+                name: 'NFTPass',
+                description: 'NFTPasses rank ethereum addresses based on their NFT history.',
+                image: `https://nftpass.xyz/default.png`,
                 attributes: [
                     {
                         "display_type": 'number',
                         "trait_type": 'Score',
-                        "value": 0
+                        "value": parseInt(score)
                     }
                 ]
             }
