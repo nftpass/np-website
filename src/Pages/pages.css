@@ -50,3 +50,23 @@
 .hidden {
     display: none;
 }
+
+.score-breakdown {
+    background-color: #EFEFEF;
+    border: 5px solid black;
+    border-radius: 0%;
+    min-height: 100%;
+    overflow-y: scroll;
+}
+
+.collection {
+    position: relative;
+    display: inline;
+    font-size: 12px;
+}
+
+.points {
+    position: relative;
+    display: inline;
+    text-align: right;
+}

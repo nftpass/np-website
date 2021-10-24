@@ -114,6 +114,25 @@ export class ViewScore extends Component {
                                             <Button style={{backgroundColor: 'rgba(0, 0, 0, 1)', borderRadius: '0', border: '0'}} className='w-100' href='/mint'>Mint it!</Button>
                                         </Row>
                                     </Col>
+                                    {this.state.scoreBreakdown && this.state.scoreBreakdown.length > 2 &&
+                                        <Col className='p-3 score-breakdown'
+                                        >
+                                            {this.state.scoreBreakdown &&
+                                                this.state.scoreBreakdown.map((breakdown) => {
+                                                    if(breakdown.points != 0) {
+                                                        return (
+                                                            <div  className='collection' key={breakdown.contractAddress}>
+                                                                <p>{breakdown.collectionName} | +{breakdown.points}</p>
+                                                            </div>
+                                                        )
+                                                    }
+                                                })
+                                            }
+                                                <div className='collection'>
+                                                    <p>And more...</p>
+                                                </div>
+                                            </Col>
+                                                                                }
                                 </Row>
                             </Container>
                         </div>
