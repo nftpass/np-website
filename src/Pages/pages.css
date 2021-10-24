@@ -29,17 +29,20 @@
 }
 
 .pepe {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
-    max-width: 20%;
+    max-width: 30%;
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 992px) {
     .pepe {
-        position: absolute;
-        bottom: 0;
-        right: 0;
         max-width: 50%;
+    }
+}
+
+@media only screen and (min-width: 1400px) {
+    .pepe {
+        max-width: 35%;
     }
 }
