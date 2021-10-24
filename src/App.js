@@ -4,9 +4,12 @@ import Web3 from "web3";
 import { BrowserRouter as Router } from "react-router-dom";
 import BlockchainContext from "./Context/BlockchainContext";
 import Routes from "./Routes";
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import ReactGA from "react-ga4";
 import { Helmet } from "react-helmet";
+import { NavComp } from "./Components/Navbar";
+import { Button, Col, Row } from "react-bootstrap";
+import NFTPass from "./contracts/NFTPassABI.json";
 
 ReactGA.initialize("G-TWE1F7Y03G");
 
@@ -15,99 +18,108 @@ class App extends Component {
     super();
     this.state = {
       accounts: null,
-      balance: 0,
       networkId: null,
       web3: new Web3(window.ethereum),
+      contract: null,
     };
-    this.connected = false;
+    this.connectWeb3 = this.connectWeb3.bind(this);
   }
 
   componentDidMount() {
     ReactGA.send("pageview");
+
+    this.connectWeb3()
+    this.setState(
+      {
+          contract: new this.state.web3.eth.Contract(
+              NFTPass,
+              "0x8d2De24678bD8BD2486f943b633a341E33FBd251"
+          ),
+      },
+      () => {
+          console.log(this.state.contract);
+      }
+  );
+  }
+
+  async connectWeb3() {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        this.setState({ accounts })
+      } catch (error) {
+        if (error.code === 4001) {
+          // User rejected request
+        }
+    
+        console.log(error)
+      }
+    }
   }
 
   render() {
-    const balance = this.state.balance;
+
     const web3 = this.state.web3;
     const accounts = this.state.accounts;
-    if (this.state.accounts !== null && this.state.contract !== null) {
-      this.connected = true;
-    }
-    return (
-      <div className="App">
-        <Helmet>
-          <meta charSet="utf-8" />
-          <title>Nftpass — your wallet score and rank</title>
-          <link rel="canonical" href="https://nftpass.xyz/" />
-          <meta
-            name="description"
-            content="Find out your wallet score and rank. Mint NFT with a proof. Brag about it."
-          />
-        </Helmet>
-        <Router>
-          <BlockchainContext.Provider value={{ balance, web3, accounts }}>
-            <Navbar
-              variant="dark"
-              expand="lg"
-              style={{ backgroundColor: "rgba(0, 0, 0, 0)", height: "5em" }}
-            >
-              <Container fluid>
-                <Navbar.Brand href="/">
-                  <img
-                    src="logowithtext.svg"
-                    style={{ height: "2em" }}
-                    alt=""
-                  />
-                </Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                  <Nav className="ml-auto">
-                    <Nav.Link
-                      style={{ color: "black" }}
-                      className="navlink"
-                      href="https://github.com/nftpass/"
-                    >
-                      Github
-                    </Nav.Link>
-                    <Nav.Link
-                      style={{ color: "black" }}
-                      className="navlink"
-                      href="https://github.com/nftpass/smart-contracts"
-                    >
-                      Contract
-                    </Nav.Link>
-                  </Nav>
-                  {/* <Nav
-                    className="mr-auto"
-                    style={{
-                      borderRadius: "0.7rem",
-                      border: "0.1px solid black",
-                    }}
-                  >
-                    {this.connected ? (
-                      <Navbar.Text style={{ padding: "10px", color: "black" }}>
-                        {accounts[0]}
-                      </Navbar.Text>
-                    ) : (
-                      <Button
-                        className="border-0 transparent"
-                        style={{ color: "black" }}
-                        onClick={() => {
-                          this.connectWeb3();
-                        }}
-                      >
-                        Connect
-                      </Button>
-                    )}
-                  </Nav> */}
-                </Navbar.Collapse>
+    const contract = this.state.contract;
+    if (this.state.accounts !== null) {
+      return (
+        <div className="App">
+          <Helmet>
+            <meta charSet="utf-8" />
+            <title>NFTPass — your wallet score and rank</title>
+            <link rel="canonical" href="https://nftpass.xyz/" />
+            <meta
+              name="description"
+              content="Find out your wallet score and rank. Mint NFT with a proof. Brag about it."
+            />
+          </Helmet>
+          <Router>
+            <BlockchainContext.Provider value={{ web3, accounts, contract }}>
+                <NavComp/>
+                <Routes />
+            </BlockchainContext.Provider>
+          </Router>
+        </div>
+      )
+    } else {
+      return (
+        <div className="App">
+          <Helmet>
+            <meta charSet="utf-8" />
+            <title>NFTPass — your wallet score and rank</title>
+            <link rel="canonical" href="https://nftpass.xyz/" />
+            <meta
+              name="description"
+              content="Find out your wallet score and rank. Mint NFT with a proof. Brag about it."
+            />
+          </Helmet>
+          <Router>
+            <BlockchainContext.Provider value={{ web3, accounts, contract }}>
+              <NavComp/>
+              <Container style={{textAlign: "left"}} fluid>
+                <Row className="justify-content-center align-items-center">
+                    <Col xs={{span: 12, order: 2}} lg={{span: 8, order: 1}}>
+                        <div id='app' style={{borderStyle: "none", paddingTop: '10%'}}>
+                            <h1 style={{ padding: '10px', fontFamily: 'Inter', fontWeight: '700', fontSize: '10vh' }}>Connect 🔌 your wallet and find out 🔮 your NFTPASS score! 💎</h1>
+                            <Row style={{ padding: '10px', paddingTop: '5%'}}>
+                                <Col xs={{span: 12, order: 1}} lg={{span: 'auto'}} style={{paddingTop: '10px'}}>
+                                    <Button className='border-0 w-100' style={{borderRadius: '0rem', backgroundColor: 'rgb(0,0,0)', color: 'white', fontFamily: 'Inter', fontWeight: '700', padding: '10px 20px 10px 20px'}} onClick={this.connectWeb3}><img src='metamask.svg' style={{paddingRight: '2px'}}/>Connect Metamask</Button>
+                                </Col>
+                                <Col xs={{span: 12, order: 2}} lg={{span: 'auto'}} style={{paddingTop: '10px'}}>
+                                    <Button className='border-0 w-100' disabled={true} style={{borderRadius: '0rem', backgroundColor: 'rgb(0,0,0)', color: 'white', fontFamily: 'Inter', fontWeight: '700', padding: '10px 20px 10px 20px', opacity: '0.3' }}><img src='walletconnect.svg' style={{paddingRight: '2px'}}/>WalletConnect</Button>
+                                </Col>
+                            </Row>
+                        </div>
+                    </Col>
+                    <Col xs={{span: 12, order: 1}} lg={{span: 4, order: 2}}></Col>
+                </Row>
               </Container>
-            </Navbar>
-            <Routes />
-          </BlockchainContext.Provider>
-        </Router>
-      </div>
-    );
+            </BlockchainContext.Provider>
+          </Router>
+        </div>
+      )
+    }
   }
 }
 
