@@ -41,7 +41,7 @@ export function Landing() {
                                     }}
                                     href="/score"
                                 >
-                                    Get your Score ↗
+                                    Connect Metamask ↗
                                 </Button>
                             </Col>
                         </Row>
