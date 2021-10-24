@@ -5,6 +5,7 @@ import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../Context/BlockchainContext";
+import axios from "axios";
 
 
 export class MintNFTPass extends Component {
@@ -80,7 +81,16 @@ export class MintNFTPass extends Component {
                                         txHash: res.transactionHash,
                                         scoreProgress: "minted",
                                     });
-                                });
+                                })
+                                .then(async () => {
+                                    try {
+                                        this.pinFileToIPFS()
+                                    } catch (error) {
+                                        this.setState({ scoreProgress: "error" });
+                                        console.log(error)
+                                    }
+                                    
+                                })
                         } catch (error) {
                             this.setState({ scoreProgress: "error" });
                             console.log(error);
@@ -110,7 +120,111 @@ export class MintNFTPass extends Component {
             })
         } catch (e) {
             this.setState({scoreProgress: 'error'})
+            console.log(e)
         }
+    }
+
+    pinFileToIPFS = (file) => {
+
+        //we gather a local file for this example, but any valid readStream source will work here.
+        let data = new FormData();
+        data.append('file', file);
+
+        //pinataOptions are optional
+        const pinataOptions = JSON.stringify({
+            cidVersion: 0,
+            customPinPolicy: {
+                regions: [
+                    {
+                        id: 'FRA1',
+                        desiredReplicationCount: 1
+                    },
+                    {
+                        id: 'NYC1',
+                        desiredReplicationCount: 2
+                    }
+                ]
+            }
+        });
+        data.append('pinataOptions', pinataOptions);
+
+        return axios
+            .post(`https://api.pinata.cloud/pinning/pinFileToIPFS`, data, {
+                maxBodyLength: 'Infinity', //this is needed to prevent axios from erroring out with large files
+                headers: {
+                    'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
+                    pinata_api_key: this.state.pinata_api_key,
+                    pinata_secret_api_key: this.state.pinata_secret_api_key
+                }
+            })
+            .then((response) => {
+                console.log(response.data.IpfsHash)
+                return response.data.IpfsHash;
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    };
+
+    pinJSONToIPFS = async (name, imageURL, description) => {
+        const JSONBody = {
+            pinataMetadata: {
+                name: name,
+            },
+            pinataContent: {
+                name: name,
+                description: description,
+                image: `https://gateway.pinata.cloud/ipfs/${imageURL}`,
+                attributes: [
+                    {
+                        "display_type": 'number',
+                        "trait_type": 'Score',
+                        "value": 0
+                    }
+                ]
+            }
+        }
+
+        return axios
+            .post(`https://api.pinata.cloud/pinning/pinJSONToIPFS`, JSONBody, {
+                headers: {
+                    pinata_api_key: this.state.pinata_api_key,
+                    pinata_secret_api_key: this.state.pinata_secret_api_key
+                }
+            })
+            .then((response) => {
+                return response.data.IpfsHash;
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    };
+
+    changeMetadataForHash = (newScore, hash, contract, tokenID) => {
+        const url = `https://api.pinata.cloud/pinning/hashMetadata`;
+        const body = {
+            ipfsPinHash: hash,
+            attributes: [
+                {
+                    "display_type": 'number',
+                    "trait_type": 'NFT Slots',
+                    "value": newScore,
+                }
+            ]
+        };
+        return axios
+            .put(url, body, {
+                headers: {
+                    pinata_api_key: this.state.pinata_api_key,
+                    pinata_secret_api_key: this.state.pinata_secret_api_key
+                }
+            })
+            .then(function (response) {
+                console.log(response)
+            })
+            .catch(function (error) {
+                console.log(error)
+            });
     }
 
     render () {
