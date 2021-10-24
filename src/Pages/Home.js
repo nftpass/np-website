@@ -211,36 +211,6 @@ export class Home extends Component {
                                                 Connect Metamask
                                             </Button>
                                         </Col>
-                                        <Col
-                                            xs={{ span: 12, order: 2 }}
-                                            lg={{ span: "auto" }}
-                                            style={{ paddingTop: "10px" }}
-                                        >
-                                            <Button
-                                                className="border-0 w-100"
-                                                disabled={true}
-                                                style={{
-                                                    borderRadius: "0rem",
-                                                    backgroundColor:
-                                                        "rgb(0,0,0)",
-                                                    color: "white",
-                                                    fontFamily: "Inter",
-                                                    fontWeight: "700",
-                                                    padding:
-                                                        "10px 20px 10px 20px",
-                                                    opacity: "0.3",
-                                                }}
-                                                onClick={this.getScore}
-                                            >
-                                                <img
-                                                    src="walletconnect.svg"
-                                                    style={{
-                                                        paddingRight: "2px",
-                                                    }}
-                                                />
-                                                WalletConnect
-                                            </Button>
-                                        </Col>
                                     </Row>
                                 </div>
                             </Col>
