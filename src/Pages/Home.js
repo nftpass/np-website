@@ -30,6 +30,7 @@ export class Home extends Component {
       },
       app: null,
       database: null,
+      showPepe: true,
     };
     this.getScore = this.getScore.bind(this);
     this.mintNFTPass = this.mintNFTPass.bind(this);
@@ -82,6 +83,7 @@ export class Home extends Component {
         loaderText: "Connecting to web3",
       });
       await this.connectWeb3(metamask).then((res) => {
+        this.state.showPepe = false;
         console.log(res);
         if (res.code !== 4001) {
           this.setState({
@@ -354,7 +356,11 @@ export class Home extends Component {
             </div>
           )}
         </Row>
-        <Image src="/pepe.png" fluid className="pepe" />
+        <Image
+          src="/pepe.png"
+          fluid
+          className={this.state.showPepe ? "pepe" : "hidden"}
+        />
       </Container>
     );
   }

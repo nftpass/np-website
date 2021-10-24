@@ -46,3 +46,7 @@
         max-width: 35%;
     }
 }
+
+.hidden {
+    display: none;
+}
