@@ -33,7 +33,7 @@ export class NavComp extends Component {
                       className="navlink"
                       href="https://github.com/nftpass/"
                     >
-                      Github
+                      GitHub
                     </Nav.Link>
                     <Nav.Link
                       style={{ color: "black" }}
