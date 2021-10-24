@@ -49,14 +49,24 @@ export class ViewScore extends Component {
             );
             await response.json().then(async (res) => {
                 if (res.success) {
-                    const starCountRef = ref(
-                        this.state.database,
-                        "score/" + this.context.accounts[0]
-                    );
-                    onValue(starCountRef, async (snapshot) => {
-                        const data = await snapshot.val();
-                        this.setState({ scores: data.score });
-                    });
+                    try{
+                        const starCountRef = ref(
+                            this.state.database,
+                            "score/" + this.context.accounts[0]
+                        );
+                        onValue(starCountRef, async (snapshot) => {
+                            try{
+                                const data = await snapshot.val();
+                                this.setState({ scores: data.score });
+                            } catch (e) {
+                                console.log(e)
+                                this.setState({scoreProgress: 'error'})
+                            }
+                        });
+                    } catch(e) {
+                        console.log(e)
+                        throw new Error();
+                    }
                 } else {
                     throw new Error();
                 }
@@ -95,6 +105,18 @@ export class ViewScore extends Component {
                         </div>
                     </Row>
                 </Container>
+            )
+        } else if(this.state.scoreProgress == 'error') {
+            return(
+                <div id="app" style={{ borderStyle: "none", padding: "20%" }}>
+                    <Container className="justify-content-center">
+                        <Row className="justify-content-center align-items-center">
+                            <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
+                                Oops! <br/> An error occured.
+                            </h4>
+                        </Row>
+                    </Container>
+                </div>
             )
         } else {
             return(

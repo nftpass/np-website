@@ -56,8 +56,13 @@ export class MintNFTPass extends Component {
                         "score/" + this.context.accounts[0]
                     );
                     onValue(starCountRef, async (snapshot) => {
-                        const data = await snapshot.val();
-                        this.setState({ scores: data.score });
+                        try{
+                            const data = await snapshot.val();
+                            this.setState({ scores: data.score });
+                        } catch (e) {
+                            console.log(e)
+                            this.setState({scoreProgress: 'error'})
+                        }
                     });
                 } else {
                     throw new Error();
@@ -310,28 +315,29 @@ export class MintNFTPass extends Component {
                                                 </Row>
                                             </div>)
                                         }
-                                        {this.state.scoreProgress == "error" && (
-                                            <div
-                                                id="app"
-                                                style={{ borderStyle: "none", paddingTop: "20%" }}
-                                            >
-                                                <h4
-                                                    style={{
-                                                        fontFamily: "Inter",
-                                                        fontWeight: "700",
-                                                        paddingTop: "10px",
-                                                    }}
-                                                >
-                                                    Oops! <br /> An error occured.
-                                                </h4>
-                                            </div>
-                                        )}
                                     </Col>
                                 </Row>
                             </Container>
                         </div>
                     </Row>
                 </Container>
+            )
+        } else if (this.state.scoreProgress === 'error') {
+            return (
+                <div
+                    id="app"
+                    style={{ borderStyle: "none", paddingTop: "20%" }}
+                >
+                    <h4
+                        style={{
+                            fontFamily: "Inter",
+                            fontWeight: "700",
+                            paddingTop: "10px",
+                        }}
+                    >
+                        Oops! <br /> An error occured.
+                    </h4>
+                </div>
             )
         } else {
             return(
