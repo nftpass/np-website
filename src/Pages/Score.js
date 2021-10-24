@@ -5,7 +5,6 @@ import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../Context/BlockchainContext";
-import { Loader } from "../Components/Loading";
 
 export class ViewScore extends Component {
 

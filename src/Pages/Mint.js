@@ -5,7 +5,6 @@ import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../Context/BlockchainContext";
-import axios from "axios";
 
 
 export class MintNFTPass extends Component {
@@ -59,6 +58,53 @@ export class MintNFTPass extends Component {
                         try{
                             const data = await snapshot.val();
                             this.setState({ scores: data.score });
+                            const signature = await fetch(
+                                `https://nftpass.herokuapp.com/sign/${this.context.accounts[0]}`
+                            ).then((res) => res.json());
+                            if(balance == 0) {
+                                this.setState({text: 'minting new nft', scoreProgress: "progress"})
+                                    try {
+                                        console.log(signature.score)
+                                        await this.context.contract.methods
+                                            .mint(
+                                                signature.messageHash,
+                                                signature.signature,
+                                                signature.nonce,
+                                                signature.score
+                                            )
+                                            .send({ from: this.context.accounts[0], value: 0 })
+                                            .then((res) => {
+                                                this.setState({
+                                                    txHash: res.transactionHash,
+                                                    scoreProgress: "minted",
+                                                });
+                                            })
+                                    } catch (error) {
+                                        this.setState({ scoreProgress: "error" });
+                                        console.log(error);
+                                    }
+                            } else if( balance == 1) {
+                                this.setState({text: 'updating current nft', scoreProgress: "progress"})
+                                try {
+                                    await this.context.contract.methods
+                                        .updateScore(
+                                            signature.messageHash,
+                                            signature.signature,
+                                            signature.nonce,
+                                            signature.score
+                                        )
+                                        .send({ from: this.context.accounts[0], value: 0 })
+                                        .then((res) => {
+                                            this.setState({
+                                                txHash: res.transactionHash,
+                                                scoreProgress: "minted",
+                                            });
+                                        });
+                                } catch (error) {
+                                    this.setState({ scoreProgress: "error" });
+                                    console.log(error);
+                                }
+                            }
                         } catch (e) {
                             console.log(e)
                             this.setState({scoreProgress: 'error'})
@@ -68,172 +114,10 @@ export class MintNFTPass extends Component {
                     throw new Error();
                 }
             })
-            .then(async () => {
-                const signature = await fetch(
-                    `https://nftpass.herokuapp.com/sign/${this.context.accounts[0]}`
-                ).then((res) => res.json());
-                if(balance == 0) {
-                    this.setState({text: 'minting new nft', scoreProgress: "progress"})
-                    this.pinJSONToIPFS(this.state.scores)
-                        .then((res) => {console.log(`https://gateway.pinata.cloud/ipfs/${res}`)})
-                        try {
-                            await this.context.contract.methods
-                                .mint(
-                                    signature.messageHash,
-                                    signature.signature,
-                                    signature.nonce,
-                                    signature.score
-                                )
-                                .send({ from: this.context.accounts[0], value: 0 })
-                                .then((res) => {
-                                    this.setState({
-                                        txHash: res.transactionHash,
-                                        scoreProgress: "minted",
-                                    });
-                                })
-                                .then(async () => {
-                                    try {
-                                        const metadata = this.pinJSONToIPFS(this.state.score)
-                                        console.log(metadata)
-                                    } catch (error) {
-                                        this.setState({ scoreProgress: "error" });
-                                        console.log(error)
-                                    }
-                                })
-                        } catch (error) {
-                            this.setState({ scoreProgress: "error" });
-                            console.log(error);
-                        }
-                } else if( balance == 1) {
-                    this.setState({text: 'updating current nft', scoreProgress: "progress"})
-                    try {
-                        await this.context.contract.methods
-                            .updateScore(
-                                signature.messageHash,
-                                signature.signature,
-                                signature.nonce,
-                                signature.score
-                            )
-                            .send({ from: this.context.accounts[0], value: 0 })
-                            .then((res) => {
-                                this.setState({
-                                    txHash: res.transactionHash,
-                                    scoreProgress: "minted",
-                                });
-                            });
-                    } catch (error) {
-                        this.setState({ scoreProgress: "error" });
-                        console.log(error);
-                    }
-                }
-            })
         } catch (e) {
             this.setState({scoreProgress: 'error'})
             console.log(e)
         }
-    }
-
-    pinFileToIPFS = (file) => {
-
-        //we gather a local file for this example, but any valid readStream source will work here.
-        let data = new FormData();
-        data.append('file', file);
-
-        //pinataOptions are optional
-        const pinataOptions = JSON.stringify({
-            cidVersion: 0,
-            customPinPolicy: {
-                regions: [
-                    {
-                        id: 'FRA1',
-                        desiredReplicationCount: 1
-                    },
-                    {
-                        id: 'NYC1',
-                        desiredReplicationCount: 2
-                    }
-                ]
-            }
-        });
-        data.append('pinataOptions', pinataOptions);
-
-        return axios
-            .post(`https://api.pinata.cloud/pinning/pinFileToIPFS`, data, {
-                maxBodyLength: 'Infinity', //this is needed to prevent axios from erroring out with large files
-                headers: {
-                    'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
-                    pinata_api_key: this.state.pinata_api_key,
-                    pinata_secret_api_key: this.state.pinata_secret_api_key
-                }
-            })
-            .then((response) => {
-                console.log(response.data.IpfsHash)
-                return response.data.IpfsHash;
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-    };
-
-    pinJSONToIPFS = async (score) => {
-        const JSONBody = {
-            pinataMetadata: {
-                name: 'NFTPass',
-            },
-            pinataContent: {
-                name: 'NFTPass',
-                description: 'NFTPasses rank ethereum addresses based on their NFT history.',
-                image: `https://nftpass.xyz/default.png`,
-                attributes: [
-                    {
-                        "display_type": 'number',
-                        "trait_type": 'Score',
-                        "value": parseInt(score)
-                    }
-                ]
-            }
-        }
-
-        return axios
-            .post(`https://api.pinata.cloud/pinning/pinJSONToIPFS`, JSONBody, {
-                headers: {
-                    pinata_api_key: this.state.pinata_api_key,
-                    pinata_secret_api_key: this.state.pinata_secret_api_key
-                }
-            })
-            .then((response) => {
-                return response.data.IpfsHash;
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-    };
-
-    changeMetadataForHash = (newScore, hash, contract, tokenID) => {
-        const url = `https://api.pinata.cloud/pinning/hashMetadata`;
-        const body = {
-            ipfsPinHash: hash,
-            attributes: [
-                {
-                    "display_type": 'number',
-                    "trait_type": 'NFT Slots',
-                    "value": newScore,
-                }
-            ]
-        };
-        return axios
-            .put(url, body, {
-                headers: {
-                    pinata_api_key: this.state.pinata_api_key,
-                    pinata_secret_api_key: this.state.pinata_secret_api_key
-                }
-            })
-            .then(function (response) {
-                console.log(response)
-            })
-            .catch(function (error) {
-                console.log(error)
-            });
     }
 
     render () {
