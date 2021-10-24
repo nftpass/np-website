@@ -33,7 +33,7 @@ class App extends Component {
       {
           contract: new this.state.web3.eth.Contract(
               NFTPass,
-              "0x8d2De24678bD8BD2486f943b633a341E33FBd251"
+              "0x48647b5E64f4ECb7F9E2BA11461Cc2fA4438d816"
           ),
       },
       () => {
