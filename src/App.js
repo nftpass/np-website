@@ -69,7 +69,7 @@ class App extends Component {
             <link rel="canonical" href="https://nftpass.xyz/" />
             <meta
               name="description"
-              content="Find out your wallet score and rank. Mint NFT with a proof. Brag about it."
+              content="Find out your wallet score. Prove your are not a bot. Mint NFT with a proof. Brag about it."
             />
           </Helmet>
           <Router>
