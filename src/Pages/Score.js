@@ -62,6 +62,20 @@ export class ViewScore extends Component {
                                 this.setState({scoreProgress: 'error'})
                             }
                         });
+                        const starCountBreakdownRef = ref(
+                            this.state.database,
+                            "scoreBreakdown/" + this.context.accounts[0]
+                        );
+                        onValue(starCountBreakdownRef, async (snapshot) => {
+                            try{
+                                const data = await snapshot.val();
+                                console.log(data)
+                                this.setState({ scoreBreakdown: data.scoreComponents });
+                            } catch (e) {
+                                console.log(e)
+                                this.setState({scoreProgress: 'error'})
+                            }
+                        });
                     } catch(e) {
                         console.log(e)
                         throw new Error();
@@ -70,6 +84,7 @@ export class ViewScore extends Component {
                     throw new Error();
                 }
             });
+
         } catch (e) {
             this.setState({scoreProgress: 'error'})
         }
