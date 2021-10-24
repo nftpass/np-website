@@ -292,7 +292,7 @@ export class MintNFTPass extends Component {
                                                         View on Etherscan ↗
                                                     </a>
                                                 </Row>
-                                                <Row
+                                                {/* <Row
                                                     style={{
                                                         paddingTop: "5%",
                                                         textAlign: "center",
@@ -312,7 +312,7 @@ export class MintNFTPass extends Component {
                                                     >
                                                         View in OpenSea ↗
                                                     </a>
-                                                </Row>
+                                                </Row> */}
                                             </div>)
                                         }
                                     </Col>

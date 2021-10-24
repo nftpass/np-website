@@ -51,14 +51,12 @@ class App extends Component {
         if (error.code === 4001) {
           // User rejected request
         }
-    
         console.log(error)
       }
     }
   }
 
   render() {
-
     const web3 = this.state.web3;
     const accounts = this.state.accounts;
     const contract = this.state.contract;
@@ -83,6 +81,10 @@ class App extends Component {
         </div>
       )
     } else {
+      let fontSize = 10;
+      if(window.innerHeight/window.innerWidth >= 1) {
+          fontSize = 5
+      }
       return (
         <div className="App">
           <Helmet>
@@ -101,7 +103,7 @@ class App extends Component {
                 <Row className="justify-content-center align-items-center">
                     <Col xs={{span: 12, order: 2}} lg={{span: 8, order: 1}}>
                         <div id='app' style={{borderStyle: "none", paddingTop: '10%'}}>
-                            <h1 style={{ padding: '10px', fontFamily: 'Inter', fontWeight: '700', fontSize: '10vh' }}>Connect 🔌 your wallet and find out 🔮 your NFTPASS score! 💎</h1>
+                            <h1 style={{ padding: '10px', fontFamily: 'Inter', fontWeight: '700', fontSize: `${fontSize}vh` }}>Connect 🔌 your wallet and find out 🔮 your NFTPASS score! 💎</h1>
                             <Row style={{ padding: '10px', paddingTop: '5%'}}>
                                 <Col xs={{span: 12, order: 1}} lg={{span: 'auto'}} style={{paddingTop: '10px'}}>
                                     <Button className='border-0 w-100' style={{borderRadius: '0rem', backgroundColor: 'rgb(0,0,0)', color: 'white', fontFamily: 'Inter', fontWeight: '700', padding: '10px 20px 10px 20px'}} onClick={this.connectWeb3}><img src='metamask.svg' style={{paddingRight: '2px'}}/>Connect Metamask</Button>
