@@ -5,6 +5,7 @@ import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../Context/BlockchainContext";
+import config from "../config";
 
 export class ViewScore extends Component {
 
@@ -44,7 +45,7 @@ export class ViewScore extends Component {
         try {
             // this.setState({loaderText: <>Calculating your score! <br/> this will take a minute...</>})
             const response = await fetch(
-                `https://nftpass.herokuapp.com/get_score/${this.context.accounts[0]}`
+                `${config.backend_endpoint}/get_score/${this.context.accounts[0]}`
             );
             await response.json().then(async (res) => {
                 if (res.success) {

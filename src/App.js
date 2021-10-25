@@ -10,8 +10,10 @@ import { Helmet } from "react-helmet";
 import { NavComp } from "./Components/Navbar";
 import { Button, Col, Row } from "react-bootstrap";
 import NFTPass from "./contracts/NFTPassABI.json";
+import config from "./config";
 
-ReactGA.initialize("G-TWE1F7Y03G");
+
+ReactGA.initialize(config.google_analytics);
 
 class App extends Component {
   constructor() {
@@ -33,7 +35,7 @@ class App extends Component {
       {
           contract: new this.state.web3.eth.Contract(
               NFTPass,
-              "0x48647b5E64f4ECb7F9E2BA11461Cc2fA4438d816"
+              config.contract_address
           ),
       },
       () => {
@@ -66,7 +68,7 @@ class App extends Component {
           <Helmet>
             <meta charSet="utf-8" />
             <title>NFTPass — your wallet score and rank</title>
-            <link rel="canonical" href="https://nftpass.xyz/" />
+            <link rel="canonical" href="/" />
             <meta
               name="description"
               content="Find out your wallet score. Prove your are not a bot. Mint NFT with a proof. Brag about it."
@@ -90,7 +92,7 @@ class App extends Component {
           <Helmet>
             <meta charSet="utf-8" />
             <title>NFTPass — your wallet score and rank</title>
-            <link rel="canonical" href="https://nftpass.xyz/" />
+            <link rel="canonical" href="/" />
             <meta
               name="description"
               content="Find out your wallet score and rank. Mint NFT with a proof. Brag about it."

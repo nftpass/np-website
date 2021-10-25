@@ -98,7 +98,7 @@ export class Home extends Component {
         }
       });
       const response = await fetch(
-        `https://nftpass.herokuapp.com/get_score/${this.state.accounts[0]}`
+        `${config.backend_endpoint}/get_score/${this.state.accounts[0]}`
       );
       await response.json().then(async (res) => {
         if (res.success) {
