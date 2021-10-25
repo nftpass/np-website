@@ -4,7 +4,7 @@ import Web3 from "web3";
 import { BrowserRouter as Router } from "react-router-dom";
 import BlockchainContext from "./Context/BlockchainContext";
 import Routes from "./Routes";
-import { Container } from "react-bootstrap";
+import { Container, Image } from "react-bootstrap";
 import ReactGA from "react-ga4";
 import { Helmet } from "react-helmet";
 import { NavComp } from "./Components/Navbar";
@@ -23,25 +23,28 @@ class App extends Component {
       networkId: null,
       web3: new Web3(window.ethereum),
       contract: null,
+      scoreProgress: null
     };
     this.connectWeb3 = this.connectWeb3.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    console.log(window.innerWidth)
     ReactGA.send("pageview");
 
-    this.connectWeb3()
-    this.setState(
-      {
-          contract: new this.state.web3.eth.Contract(
-              NFTPass,
-              config.contract_address
-          ),
-      },
-      () => {
-          console.log(this.state.contract);
-      }
-  );
+    if(window.ethereum) {
+      this.connectWeb3()
+      this.setState(
+        {
+            contract: new this.state.web3.eth.Contract(
+                NFTPass,
+                config.contract_address
+            ),
+        },
+      );
+      this.setState({networkId: await this.state.web3.eth.net.getId()})
+    }
+
   }
 
   async connectWeb3() {
@@ -49,6 +52,45 @@ class App extends Component {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         this.setState({ accounts })
+        
+        if (this.state.web3.eth.net.getId() !== 4) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
+            })     
+            .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
+          } catch (e) {
+            if(e.code !== 4001) {
+              try{
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0x89',
+                    chainName: 'Matic (Polygon) Mainnet',
+                    nativeCurrency: {
+                        name: 'MATIC',
+                        symbol: 'MATIC',
+                        decimals: 18
+                    },
+                    rpcUrls: ['https://rpc-mainnet.matic.network'],
+                    blockExplorerUrls: ['https://polygonscan.com']
+                }]
+                }).then( async() => {
+                  await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
+                  })     
+                  .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
+                })
+              } catch (e) {
+                console.log(e)
+              }
+            }
+            console.log(e)
+          }
+
+        }
       } catch (error) {
         if (error.code === 4001) {
           // User rejected request
@@ -61,8 +103,14 @@ class App extends Component {
   render() {
     const web3 = this.state.web3;
     const accounts = this.state.accounts;
-    const contract = this.state.contract;
-    if (this.state.accounts !== null) {
+    const contract = this.state.contract; 
+    if(window.ethereum) {
+      window.ethereum.on('chainChanged', (chain) => {this.setState({networkId: parseInt(chain)})})
+      window.ethereum.on('accountsChanged', (accounts) => {this.setState({accounts})});
+      
+    }
+
+    if (this.state.accounts !== null && this.state.networkId === 137) {
       return (
         <div className="App">
           <Helmet>
@@ -115,6 +163,7 @@ class App extends Component {
                     </Col>
                     <Col xs={{span: 12, order: 1}} lg={{span: 4, order: 2}}></Col>
                 </Row>
+                <Image src="/pepe.png" fluid className="pepe" />
               </Container>
             </BlockchainContext.Provider>
           </Router>

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Col, Container, Row, Spinner } from "react-bootstrap";
+import { Col, Container, Row, Spinner } from "react-bootstrap";
 import './pages.css'
 import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
@@ -171,9 +171,9 @@ export class MintNFTPass extends Component {
                                                             fontWeight: "700",
                                                             padding: "10px 20px 10px 20px",
                                                         }}
-                                                        href={`https://rinkeby.etherscan.io/tx/${this.state.txHash}`}
+                                                        href={`https://polygonscan.com/tx/${this.state.txHash}`}
                                                     >
-                                                        View on Etherscan ↗
+                                                        View on PolygonScan ↗
                                                     </a>
                                                 </Row>
                                                 {/* <Row
