@@ -4,7 +4,7 @@ import Web3 from "web3";
 import { BrowserRouter as Router } from "react-router-dom";
 import BlockchainContext from "./Context/BlockchainContext";
 import Routes from "./Routes";
-import { Container } from "react-bootstrap";
+import { Container, Image } from "react-bootstrap";
 import ReactGA from "react-ga4";
 import { Helmet } from "react-helmet";
 import { NavComp } from "./Components/Navbar";
@@ -27,21 +27,21 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    console.log(window.innerWidth)
     ReactGA.send("pageview");
-
-    this.connectWeb3()
-    this.setState(
-      {
-          contract: new this.state.web3.eth.Contract(
-              NFTPass,
-              "0xFdD8B67c0E63e93Aa1963248646378a3E8C819f4"
-          ),
-      },
-      () => {
-          console.log(this.state.contract);
-      }
-    );
-    this.setState({networkId: await this.state.web3.eth.net.getId()})
+  
+    if(window.ethereum) {
+      this.connectWeb3()
+      this.setState(
+        {
+            contract: new this.state.web3.eth.Contract(
+                NFTPass,
+                "0xFdD8B67c0E63e93Aa1963248646378a3E8C819f4"
+            ),
+        },
+      );
+      this.setState({networkId: await this.state.web3.eth.net.getId()})
+    }
   }
 
   async connectWeb3() {
@@ -50,13 +50,13 @@ class App extends Component {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         this.setState({ accounts })
         
-        if (this.state.web3.eth.net.getId() != 4) {
+        if (this.state.web3.eth.net.getId() !== 4) {
           try {
-            const networkId = await window.ethereum.request({
+            await window.ethereum.request({
               method: 'wallet_switchEthereumChain',
               params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
             })     
-            .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()}, (console.log(this.state.networkId)))})
+            .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
           } catch (e) {
             console.log(e)
           }
@@ -75,9 +75,13 @@ class App extends Component {
     const web3 = this.state.web3;
     const accounts = this.state.accounts;
     const contract = this.state.contract; 
-    window.ethereum.on('chainChanged', (chain) => {this.setState({networkId: parseInt(chain)})})
+    if(window.ethereum) {
+      window.ethereum.on('chainChanged', (chain) => {this.setState({networkId: parseInt(chain)})})
+      window.ethereum.on('accountsChanged', (accounts) => {this.setState({accounts})});
+      
+    }
 
-    if (this.state.accounts !== null && this.state.networkId == 137) {
+    if (this.state.accounts !== null && this.state.networkId === 137) {
       return (
         <div className="App">
           <Helmet>
@@ -130,6 +134,7 @@ class App extends Component {
                     </Col>
                     <Col xs={{span: 12, order: 1}} lg={{span: 4, order: 2}}></Col>
                 </Row>
+                <Image src="/pepe.png" fluid className="pepe" />
               </Container>
             </BlockchainContext.Provider>
           </Router>

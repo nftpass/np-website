@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Col, Container, Row, Spinner } from "react-bootstrap";
+import { Col, Container, Row, Spinner } from "react-bootstrap";
 import './pages.css'
 import Web3 from "web3";
 import { initializeApp } from 'firebase/app';

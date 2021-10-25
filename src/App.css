@@ -39,10 +39,6 @@
   }
 }
 
-.navlink {
-  color: black;
-}
-
 .transparent {
   background-color: rgba(0, 0, 0, 0);
   transition: 0.3s;
@@ -51,4 +47,30 @@
 .transparent:hover{
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 0.7rem;
+}
+
+.pepe {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  max-width: 30%;
+}
+
+@media only screen and (min-width: 992px) {
+  .pepe {
+      max-width: 50%;
+  }
+}
+
+@media only screen and (min-width: 192px) {
+  .navbar {
+    background-color: white;
+    border-radius: 1rem;
+  }
+}
+
+@media only screen and (min-width: 1400px) {
+  .pepe {
+      max-width: 35%;
+  }
 }
