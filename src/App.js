@@ -58,29 +58,31 @@ class App extends Component {
             })     
             .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
           } catch (e) {
-            try{
-              await window.ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [{
-                  chainId: '0x89',
-                  chainName: 'Matic (Polygon) Mainnet',
-                  nativeCurrency: {
-                      name: 'MATIC',
-                      symbol: 'MATIC',
-                      decimals: 18
-                  },
-                  rpcUrls: ['https://rpc-mainnet.matic.network'],
-                  blockExplorerUrls: ['https://polygonscan.com']
-              }]
-              }).then( async() => {
+            if(e.code !== 4001) {
+              try{
                 await window.ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
-                })     
-                .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
-              })
-            } catch (e) {
-              console.log(e)
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0x89',
+                    chainName: 'Matic (Polygon) Mainnet',
+                    nativeCurrency: {
+                        name: 'MATIC',
+                        symbol: 'MATIC',
+                        decimals: 18
+                    },
+                    rpcUrls: ['https://rpc-mainnet.matic.network'],
+                    blockExplorerUrls: ['https://polygonscan.com']
+                }]
+                }).then( async() => {
+                  await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
+                  })     
+                  .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
+                })
+              } catch (e) {
+                console.log(e)
+              }
             }
             console.log(e)
           }
