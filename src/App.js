@@ -21,11 +21,12 @@ class App extends Component {
       networkId: null,
       web3: new Web3(window.ethereum),
       contract: null,
+      scoreProgress: null
     };
     this.connectWeb3 = this.connectWeb3.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     ReactGA.send("pageview");
 
     this.connectWeb3()
@@ -39,7 +40,8 @@ class App extends Component {
       () => {
           console.log(this.state.contract);
       }
-  );
+    );
+    this.setState({networkId: await this.state.web3.eth.net.getId()})
   }
 
   async connectWeb3() {
@@ -47,6 +49,19 @@ class App extends Component {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         this.setState({ accounts })
+        
+        if (this.state.web3.eth.net.getId() != 4) {
+          try {
+            const networkId = await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x4' }], // chainId must be in hexadecimal numbers
+            })     
+            this.setState({networkId: await this.state.web3.eth.net.getId()})
+          } catch (e) {
+            console.log(e)
+          }
+
+        }
       } catch (error) {
         if (error.code === 4001) {
           // User rejected request
@@ -59,8 +74,10 @@ class App extends Component {
   render() {
     const web3 = this.state.web3;
     const accounts = this.state.accounts;
-    const contract = this.state.contract;
-    if (this.state.accounts !== null) {
+    const contract = this.state.contract; 
+    console.log(this.state.networkId)
+
+    if (this.state.accounts !== null && this.state.networkId == 4) {
       return (
         <div className="App">
           <Helmet>
@@ -79,6 +96,19 @@ class App extends Component {
             </BlockchainContext.Provider>
           </Router>
         </div>
+      )
+    } else if(this.state.networkId != 4) {
+      return(
+          <div id="app" style={{ borderStyle: "none", padding: "20%" }}>
+              <Container className="justify-content-center">
+                  <Row className="justify-content-center align-items-center">
+                      <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
+                          Oops! <br/> Please connect to Rinkeby Network on MetaMask
+                      </h4>
+                      <Button className='border-0' style={{borderRadius: '0rem', backgroundColor: 'rgb(0,0,0)', color: 'white', fontFamily: 'Inter', fontWeight: '700', padding: '10px 20px 10px 20px'}} onClick={this.connectWeb3}><img src='metamask.svg' style={{paddingRight: '2px'}}/>Connect Metamask</Button>
+                  </Row>
+              </Container>
+          </div>
       )
     } else {
       let fontSize = 10;
