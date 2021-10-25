@@ -6,6 +6,8 @@ import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../Context/BlockchainContext";
 import config from "../config";
+import getNFTScore from "../helpers/score"
+import mintNFT from "../helpers/sign"
 
 export class MintNFTPass extends Component {
 
@@ -45,9 +47,8 @@ export class MintNFTPass extends Component {
         this.state.database = getDatabase(this.state.app);
         const balance = await this.context.contract.methods.balanceOf(this.context.accounts[0]).call({from: this.context.accounts[0]})
         try {
-            const response = await fetch(
-                `${config.backend_endpoint}/get_score/${this.context.accounts[0]}`
-            );
+            const address = this.context.accounts[0];
+            const response = await getNFTScore(address);
             await response.json().then(async (res) => {
                 if (res.success) {
                     const starCountRef = ref(
@@ -58,9 +59,8 @@ export class MintNFTPass extends Component {
                         try{
                             const data = await snapshot.val();
                             this.setState({ scores: data.score });
-                            const signature = await fetch(
-                                `${config.backend_endpoint}/sign/${this.context.accounts[0]}`
-                            ).then((res) => res.json());
+                            const address = this.context.accounts[0];
+                            const signature = await mintNFT(address);
                             if(balance == 0) {
                                 this.setState({text: 'minting new nft', scoreProgress: "progress"})
                                     try {

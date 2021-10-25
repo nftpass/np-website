@@ -5,7 +5,7 @@ import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../Context/BlockchainContext";
-import config from "../config";
+import getNFTScore from "../helpers/score"
 
 export class ViewScore extends Component {
 
@@ -44,9 +44,9 @@ export class ViewScore extends Component {
        
         try {
             // this.setState({loaderText: <>Calculating your score! <br/> this will take a minute...</>})
-            const response = await fetch(
-                `${config.backend_endpoint}/get_score/${this.context.accounts[0]}`
-            );
+            const address = this.context.accounts[0];
+            const response = await getNFTScore(address);
+            console.log('NFT Score: ' + response)
             await response.json().then(async (res) => {
                 if (res.success) {
                     try{
