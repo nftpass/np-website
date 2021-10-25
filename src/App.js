@@ -59,8 +59,6 @@ class App extends Component {
             .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
           } catch (e) {
             try{
-
-            } catch (e) {
               await window.ethereum.request({
                 method: 'wallet_addEthereumChain',
                 params: {
@@ -74,14 +72,15 @@ class App extends Component {
                   rpcUrls: ['https://rpc-mainnet.matic.network'],
                   blockExplorerUrls: ['https://polygonscan.com']
               }
-              }).then(async () => {
+              }).then( async() => {
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
                 })     
                 .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()})})
               })
-
+            } catch (e) {
+              console.log(e)
             }
             console.log(e)
           }
