@@ -61,7 +61,7 @@ class App extends Component {
             try{
               await window.ethereum.request({
                 method: 'wallet_addEthereumChain',
-                params: {
+                params: [{
                   chainId: '0x89',
                   chainName: 'Matic (Polygon) Mainnet',
                   nativeCurrency: {
@@ -71,7 +71,7 @@ class App extends Component {
                   },
                   rpcUrls: ['https://rpc-mainnet.matic.network'],
                   blockExplorerUrls: ['https://polygonscan.com']
-              }
+              }]
               }).then( async() => {
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
