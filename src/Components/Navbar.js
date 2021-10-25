@@ -38,7 +38,7 @@ export class NavComp extends Component {
                     <Nav.Link
                       style={{ color: "black" }}
                       className="navlink"
-                      href="https://rinkeby.etherscan.io/address/0x48647b5E64f4ECb7F9E2BA11461Cc2fA4438d816"
+                      href="https://polygonscan.com/address/0xFdD8B67c0E63e93Aa1963248646378a3E8C819f4"
                     >
                       Contract
                     </Nav.Link>

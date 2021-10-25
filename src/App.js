@@ -34,7 +34,7 @@ class App extends Component {
       {
           contract: new this.state.web3.eth.Contract(
               NFTPass,
-              "0x48647b5E64f4ECb7F9E2BA11461Cc2fA4438d816"
+              "0xFdD8B67c0E63e93Aa1963248646378a3E8C819f4"
           ),
       },
       () => {
@@ -54,9 +54,9 @@ class App extends Component {
           try {
             const networkId = await window.ethereum.request({
               method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x4' }], // chainId must be in hexadecimal numbers
+              params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
             })     
-            this.setState({networkId: await this.state.web3.eth.net.getId()})
+            .then(async() => {this.setState({networkId: await this.state.web3.eth.net.getId()}, (console.log(this.state.networkId)))})
           } catch (e) {
             console.log(e)
           }
@@ -75,9 +75,9 @@ class App extends Component {
     const web3 = this.state.web3;
     const accounts = this.state.accounts;
     const contract = this.state.contract; 
-    console.log(this.state.networkId)
+    window.ethereum.on('chainChanged', (chain) => {this.setState({networkId: parseInt(chain)})})
 
-    if (this.state.accounts !== null && this.state.networkId == 4) {
+    if (this.state.accounts !== null && this.state.networkId == 137) {
       return (
         <div className="App">
           <Helmet>
@@ -96,19 +96,6 @@ class App extends Component {
             </BlockchainContext.Provider>
           </Router>
         </div>
-      )
-    } else if(this.state.networkId != 4) {
-      return(
-          <div id="app" style={{ borderStyle: "none", padding: "20%" }}>
-              <Container className="justify-content-center">
-                  <Row className="justify-content-center align-items-center">
-                      <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
-                          Oops! <br/> Please connect to Rinkeby Network on MetaMask
-                      </h4>
-                      <Button className='border-0' style={{borderRadius: '0rem', backgroundColor: 'rgb(0,0,0)', color: 'white', fontFamily: 'Inter', fontWeight: '700', padding: '10px 20px 10px 20px'}} onClick={this.connectWeb3}><img src='metamask.svg' style={{paddingRight: '2px'}}/>Connect Metamask</Button>
-                  </Row>
-              </Container>
-          </div>
       )
     } else {
       let fontSize = 10;
