@@ -49,7 +49,7 @@ export class ViewScore extends Component {
             const response = await getNFTScore(address);
 
             await response.json().then(async (res) => {
-                if (res.successful) {
+                if (res.success) {
                     try{
                         const starCountRef = ref(
                             this.state.database,
@@ -60,6 +60,7 @@ export class ViewScore extends Component {
                                 const data = await snapshot.val();
                                 this.setState({ scores: data && data.score });
                             } catch (e) {
+                                console.log('Error when getting Firebase score value')
                                 console.log(e)
                                 this.setState({scoreProgress: 'error'})
                             }
@@ -75,6 +76,7 @@ export class ViewScore extends Component {
                                 this.setState({ scoreBreakdown: data });
                             } catch (e) {
                                 console.log(e)
+                                console.log('Error when getting Firebase score breakdown')
                                 this.setState({scoreProgress: 'error'})
                             }
                         });
@@ -88,6 +90,7 @@ export class ViewScore extends Component {
             });
 
         } catch (e) {
+            console.log(e)
             this.setState({scoreProgress: 'error'})
         }
     }
