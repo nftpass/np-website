@@ -1,0 +1,54 @@
+.score-breakdown {
+    background-color: white;
+    border-radius: 0%;
+    height: 330px;
+    overflow-y: scroll;
+    width:350px;
+    padding:30px;
+}
+
+.score-component {
+    position: relative;
+    display: inline;
+    font-size: 12px;
+    margin-bottom:10px;
+    display: block;
+    color:
+
+}
+
+.score-breakdown-title
+{
+    border-bottom: 1px solid black;
+}
+
+.points-piece
+{
+    color: #FF48F8;
+}
+
+.points-collection
+{
+    color: #00B19C;
+}
+
+.score-component .points
+{
+    position: relative;
+    display: inline-block;
+    float: right;
+    font-weight:bold;
+}
+
+.score-component .score-component-text
+{
+    width: 230px;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+.points {
+    position: relative;
+    display: inline;
+    text-align: right;
+}

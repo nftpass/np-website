@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { Button, Col, Container, Row, Spinner, Image } from "react-bootstrap";
-import "./pages.css";
+import { Button, Col, Container, Row, Spinner, Image } from "react-bootstrap/esm/index";
+import "../pages.css";
 import Web3 from "web3";
-import NFTPass from "../contracts/NFTPassABI.json";
+import NFTPass from "../../contracts/NFTPassABI.json";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue } from "firebase/database";
+
 export class Home extends Component {
   constructor() {
     super();
@@ -84,7 +85,6 @@ export class Home extends Component {
       });
       await this.connectWeb3(metamask).then((res) => {
         this.state.showPepe = false;
-        console.log(res);
         if (res.code !== 4001) {
           this.setState({
             loaderText: (
@@ -98,7 +98,7 @@ export class Home extends Component {
         }
       });
       const response = await fetch(
-        `https://nftpass.herokuapp.com/get_score/${this.state.accounts[0]}`
+        `${config.backend_endpoint}/get_score/${this.state.accounts[0]}`
       );
       await response.json().then(async (res) => {
         if (res.success) {

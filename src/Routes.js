@@ -1,8 +1,8 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Landing } from './Components/Landing';
-import { MintNFTPass } from './Pages/Mint';
-import { ViewScore } from './Pages/Score';
+import { MintNFTPass } from './Pages/Mint/Mint';
+import { ViewScore } from './Pages/Score/Score';
 
 function Routes() {
     return (
