@@ -3,7 +3,7 @@ import config from "../config";
 
 async function mintNFT(address) {
     return fetch(
-        `${config.backend_endpoint}/sign/${this.context.accounts[0]}`
+        `${config.backend_endpoint}/sign/${address}`
     ).then((res) => res.json());
 }
 

@@ -1,9 +1,12 @@
 import config from "../config";
 
 
-async function getNFTScore(address) {
+const getNFTScore = async (address) => {
+    if(typeof address != 'string'){
+        return
+    }
     return fetch(
-        `${config.backend_endpoint}/get_score/${this.context.accounts[0]}`
+        `${config.backend_endpoint}/get_score/${address}`
     );
 }
 

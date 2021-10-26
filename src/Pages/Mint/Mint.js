@@ -1,13 +1,12 @@
 import React, { Component } from "react";
-import { Col, Container, Row, Spinner } from "react-bootstrap";
-import './pages.css'
+import { Col, Container, Row, Spinner } from "react-bootstrap/esm/index";
+import '../pages.css'
 import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
-import BlockchainContext from "../Context/BlockchainContext";
-import config from "../config";
-import getNFTScore from "../helpers/score"
-import mintNFT from "../helpers/sign"
+import BlockchainContext from "../../Context/BlockchainContext";
+import getNFTScore from "../../helpers/score"
+import mintNFT from "../../helpers/sign"
 
 export class MintNFTPass extends Component {
 

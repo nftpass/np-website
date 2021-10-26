@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Button, Col, Container, Row, Spinner } from "react-bootstrap";
-import './pages.css'
+import { Button, Col, Container, Row, Spinner } from "react-bootstrap/esm/index";
+import './Score.css'
 import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
-import BlockchainContext from "../Context/BlockchainContext";
-import getNFTScore from "../helpers/score"
+import BlockchainContext from "../../Context/BlockchainContext";
+import getNFTScore from "../../helpers/score.js"
 
 export class ViewScore extends Component {
 
@@ -44,11 +44,12 @@ export class ViewScore extends Component {
        
         try {
             // this.setState({loaderText: <>Calculating your score! <br/> this will take a minute...</>})
-            const address = this.context.accounts[0];
+            const address = this.context && this.context.accounts[0];
+
             const response = await getNFTScore(address);
-            console.log('NFT Score: ' + response)
+
             await response.json().then(async (res) => {
-                if (res.success) {
+                if (res.successful) {
                     try{
                         const starCountRef = ref(
                             this.state.database,
@@ -57,7 +58,7 @@ export class ViewScore extends Component {
                         onValue(starCountRef, async (snapshot) => {
                             try{
                                 const data = await snapshot.val();
-                                this.setState({ scores: data.score });
+                                this.setState({ scores: data && data.score });
                             } catch (e) {
                                 console.log(e)
                                 this.setState({scoreProgress: 'error'})
@@ -71,7 +72,7 @@ export class ViewScore extends Component {
                             try{
                                 const data = await snapshot.val();
                                 console.log(data)
-                                this.setState({ scoreBreakdown: data.scoreComponents });
+                                this.setState({ scoreBreakdown: data });
                             } catch (e) {
                                 console.log(e)
                                 this.setState({scoreProgress: 'error'})
@@ -89,6 +90,59 @@ export class ViewScore extends Component {
         } catch (e) {
             this.setState({scoreProgress: 'error'})
         }
+    }
+
+    renderBreakdown(){
+        let { scoreBreakdown } = this.state;
+        if (!scoreBreakdown)
+            return
+        let lastUpdate = new Date(scoreBreakdown.last_updated);
+        scoreBreakdown = scoreBreakdown.scoreComponents;
+        // only show if udpated sccore is fresher than 2 hours
+        const show = scoreBreakdown && scoreBreakdown.length > 0 && Math.abs(new Date() - lastUpdate) / 36e5*2 < 2;
+        if(show) {
+            return (
+                <Col className='p-5'>
+                    <div className='score-breakdown'>
+                        <p className="score-breakdown-title">What's in the score?</p>
+                        {scoreBreakdown.map((breakdown) => {
+                            if (breakdown.points > 0) {
+                                if (breakdown.type == 'collection') {
+                                    return (
+                                        <div className='score-component collection' key={breakdown.contractAddress + '_collection'}>
+                                            <div>
+                                                <div className="score-component-text">{breakdown.collectionName} collection score</div>
+                                                <div className="points points-piece">+{breakdown.points}</div>
+                                            </div>
+                                        </div>
+                                    )
+                                } else if (breakdown.type == 'piece') {
+                                    return (
+                                        <div className='score-component collection-piece' key={breakdown.contractAddress + '_' + breakdown.pieceID}>
+                                            <div>
+                                                <div className="score-component-text">{breakdown.collectionName} - {breakdown.pieceID}</div>
+                                                <div className="points points-collection">+{breakdown.points}</div>
+                                            </div>
+                                        </div>
+                                    )
+                                } else if ((breakdown.type == 'all_pieces')) {
+                                    return (
+                                        <div className='score-component collection-all-pieces' key={breakdown.collectionName + '_all_pieces'}>
+                                            <div>
+                                                <div className="score-component-text">{breakdown.collectionName} all pieces score</div>
+                                                <div className="points points-all-pieces">+{breakdown.points}</div>
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                            }
+                        })}
+                    </div>
+                </Col>
+            )
+        }
+
+
     }
 
     render () {
@@ -115,25 +169,7 @@ export class ViewScore extends Component {
                                             <Button style={{backgroundColor: 'rgba(0, 0, 0, 1)', borderRadius: '0', border: '0'}} className='w-100' href='/mint'>Mint it!</Button>
                                         </Row>
                                     </Col>
-                                    {this.state.scoreBreakdown && this.state.scoreBreakdown.length > 2 &&
-                                        <Col className='p-3 score-breakdown'
-                                        >
-                                            {this.state.scoreBreakdown &&
-                                                this.state.scoreBreakdown.map((breakdown) => {
-                                                    if(breakdown.points != 0) {
-                                                        return (
-                                                            <div  className='collection' key={breakdown.contractAddress}>
-                                                                <p>{breakdown.collectionName} | +{breakdown.points}</p>
-                                                            </div>
-                                                        )
-                                                    }
-                                                })
-                                            }
-                                                <div className='collection'>
-                                                    <p>And more...</p>
-                                                </div>
-                                            </Col>
-                                                                                }
+                                    {this.renderBreakdown()}
                                 </Row>
                             </Container>
                         </div>
