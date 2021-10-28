@@ -8,7 +8,7 @@ body {
   background-image: url("http://nftpass.xyz/background.png");
   background-size: cover;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   font-weight: 700;
 }
 
