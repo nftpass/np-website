@@ -5,7 +5,9 @@ import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../../Context/BlockchainContext";
-import getNFTScore from "../../helpers/score.js"
+import getNFTScore from "../../helpers/score.js";
+import isCachedScoreValid from "../../helpers/validCache.js";
+
 
 export class ViewScore extends Component {
 
@@ -102,7 +104,8 @@ export class ViewScore extends Component {
         let lastUpdate = new Date(scoreBreakdown.last_updated);
         scoreBreakdown = scoreBreakdown.scoreComponents;
         // only show if udpated sccore is fresher than 2 hours
-        const show = scoreBreakdown && scoreBreakdown.length > 0 && Math.abs(new Date() - lastUpdate) / 36e5*2 < 2;
+        console.log(isCachedScoreValid)
+        const show = scoreBreakdown && scoreBreakdown.length > 0 && isCachedScoreValid(lastUpdate);
         if(show) {
             return (
                 <Col className='p-5'>
