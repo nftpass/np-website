@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Container, Row, Spinner } from "react-bootstrap/esm/index";
+import { Container, Row, Spinner, Table } from "react-bootstrap/esm/index";
 import BlockchainContext from "../../Context/BlockchainContext";
 import getRank from "../../helpers/rank.js";
-import Web3 from "web3";
+import "./Rank.css";
 
 
 export class RankScore extends Component {
@@ -41,7 +41,7 @@ export class RankScore extends Component {
         let {rank, error, loading} = this.state;
         rank = rank || [];
         return(
-            <div id="app" style={{ borderStyle: "none", padding: "20%" }}>
+            <div id="app" style={{ borderStyle: "none"}}>
                 <Container className="justify-content-center">
                     {
                         loading && (
@@ -53,11 +53,24 @@ export class RankScore extends Component {
                     {
                         !loading && (
                             <Row className="justify-content-center align-items-center">
-                                {rank.map((address) => {
-                                    return (<div>
-                                        {address.address} | {address.score}
-                                    </div>)
-                                })}
+                                <Table>
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Score</th>
+                                            <th>Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rank.map((address, index) => {
+                                            return (<tr>
+                                                <td>{index} </td>
+                                                <td>{address.score}</td>
+                                                <td>{address.address}</td>
+                                            </tr>)
+                                        })}
+                                    </tbody>
+                                </Table>
                             </Row>
                         )
                     }
