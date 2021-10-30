@@ -74,11 +74,24 @@ export class ViewScore extends Component {
                         onValue(starCountBreakdownRef, async (snapshot) => {
                             try{
                                 const data = await snapshot.val();
-                                console.log(data)
                                 this.setState({ scoreBreakdown: data });
                             } catch (e) {
                                 console.log(e)
                                 console.log('Error when getting Firebase score breakdown')
+                                this.setState({scoreProgress: 'error'})
+                            }
+                        });
+                        const scoringProcessStatusRef = ref(
+                            this.state.database,
+                            "scoringStatus/" + this.context.accounts[0]
+                        );
+                        onValue(scoringProcessStatusRef, async (snapshot) => {
+                            try{
+                                const data = await snapshot.val();
+                                this.setState({ scoringProcessStatus: data });
+                            } catch (e) {
+                                console.log(e)
+                                console.log('Error when getting Firebase scoring proccess status')
                                 this.setState({scoreProgress: 'error'})
                             }
                         });
@@ -104,7 +117,6 @@ export class ViewScore extends Component {
         let lastUpdate = new Date(scoreBreakdown.last_updated);
         scoreBreakdown = scoreBreakdown.scoreComponents;
         // only show if udpated sccore is fresher than 2 hours
-        console.log(isCachedScoreValid)
         const show = scoreBreakdown && scoreBreakdown.length > 0 && isCachedScoreValid(lastUpdate);
         if(show) {
             return (
@@ -152,7 +164,8 @@ export class ViewScore extends Component {
     }
 
     render () {
-        if(this.state.scores !== null) {
+        let { scores, status, scoringProcessStatus } = this.state;
+        if(scores !== null) {
             return (
                 <Container style={{textAlign: "left"}} fluid>
                     <Row className="justify-content-center align-items-center">
@@ -165,7 +178,7 @@ export class ViewScore extends Component {
                                                 <img style={{minWidth: '100%', height: 'auto', border: '5px solid black'}} src='frame.png'></img>
                                                 <div className="imagecenter align-items-center">
                                                     <img src='logo.svg' width='20%' />
-                                                    <h1 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '15px'}}>{this.state.scores}</h1>
+                                                    <h1 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '15px'}}>{scores}</h1>
                                                     <p style={{ fontFamily: 'Inter', fontWeight: '700'}}>POINTS</p>
                                                 </div>
                                                 <h6 className='fixed-bottom' style={{position: "absolute", bottom: '3px', fontFamily: 'Inter', fontWeight: '700', fontSize: '0.7em'}}>NFTPASS.XYZ</h6>
@@ -176,6 +189,11 @@ export class ViewScore extends Component {
                                         </Row>
                                     </Col>
                                     {this.renderBreakdown()}
+                                </Row>
+                                <Row className="align-items-center">
+                                    <Col className='p-5 see-leaderboard'>
+                                        <a href="/leaderboard">See where you are in the leaderboard</a>
+                                    </Col>
                                 </Row>
                             </Container>
                         </div>
@@ -203,7 +221,7 @@ export class ViewScore extends Component {
                         </Row>
                         <Row className="justify-content-center align-items-center">
                             <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
-                                Calculating your score! <br /> this will take a few seconds...
+                                {scoringProcessStatus && scoringProcessStatus.status + '...'} <br /> this will take a few seconds...
                             </h4>
                         </Row>
                     </Container>

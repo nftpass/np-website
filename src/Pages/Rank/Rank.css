@@ -7,3 +7,13 @@ table
         width:150px;
     }
 }
+
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid black;
+}
+
+.user-address
+{
+    color:blue;
+}

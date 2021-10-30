@@ -3,7 +3,7 @@ import { Container, Row, Spinner, Table } from "react-bootstrap/esm/index";
 import BlockchainContext from "../../Context/BlockchainContext";
 import getRank from "../../helpers/rank.js";
 import "./Rank.css";
-
+import shortenAddress from "../../helpers/address";
 
 export class RankScore extends Component {
 
@@ -37,7 +37,23 @@ export class RankScore extends Component {
         }
     }
 
+    renderAddressRow(address, index, userAddressShort){
+        const isUser = address && address.address == userAddressShort;
+        const cssClasses = isUser ? 'user-address' : '';
+        return (
+            <tr className={cssClasses}>
+                <td>{index + 1} </td>
+                <td>{address.score}</td>
+                <td>
+                    {address.address} { isUser &&  <span>(this is you)</span>}
+                </td>
+            </tr>
+        )
+    }
+
     render () {
+        const userAddress = this.context && this.context.accounts[0];
+        const userAddressShort = shortenAddress(userAddress);
         let {rank, error, loading} = this.state;
         rank = rank || [];
         return(
@@ -63,11 +79,7 @@ export class RankScore extends Component {
                                     </thead>
                                     <tbody>
                                         {rank.map((address, index) => {
-                                            return (<tr>
-                                                <td>{index} </td>
-                                                <td>{address.score}</td>
-                                                <td>{address.address}</td>
-                                            </tr>)
+                                            return this.renderAddressRow(address, index, userAddressShort);
                                         })}
                                     </tbody>
                                 </Table>

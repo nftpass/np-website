@@ -17,7 +17,7 @@ function Routes() {
             <Route path="/mint">                
                 <MintNFTPass/>
             </Route>
-            <Route path="/rank">
+            <Route path="/leaderboard">
                 <RankScore/>
             </Route>
         </Switch>

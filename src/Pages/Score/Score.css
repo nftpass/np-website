@@ -22,6 +22,12 @@
     border-bottom: 1px solid black;
 }
 
+.see-leaderboard
+{
+    text-align:center;
+
+}
+
 .points-piece
 {
     color: #FF48F8;
