@@ -29,7 +29,6 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    console.log(window.innerWidth)
     ReactGA.send("pageview");
 
     if(window.ethereum) {
