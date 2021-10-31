@@ -7,8 +7,6 @@ import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../../Context/BlockchainContext";
 import getNFTScore from "../../helpers/score.js";
 import isCachedScoreValid from "../../helpers/validCache.js";
-
-
 export class ViewScore extends Component {
 
     static contextType = BlockchainContext;
@@ -36,26 +34,31 @@ export class ViewScore extends Component {
             app: null,
             database: null
         }
-        
+        this.fetchScore = this.fetchScore.bind(this);
     }
 
     async componentDidMount() {
+            const accounts = await this.context.web3.eth.getAccounts()
+            if(accounts[0] !== undefined) {
+                const account = accounts[0].toLowerCase() 
+                this.fetchScore(account)
+            }
+    }
+
+    async fetchScore(account) {
         this.state.app = initializeApp(this.state.firebaseConfig);
 
         this.state.database = getDatabase(this.state.app);
-       
+        
         try {
-            // this.setState({loaderText: <>Calculating your score! <br/> this will take a minute...</>})
-            const address = this.context && this.context.accounts[0];
-
-            const response = await getNFTScore(address);
+            const response = await getNFTScore(account);
 
             await response.json().then(async (res) => {
                 if (res.success) {
                     try{
                         const starCountRef = ref(
                             this.state.database,
-                            "score/" + this.context.accounts[0]
+                            "score/" + account
                         );
                         onValue(starCountRef, async (snapshot) => {
                             try{
@@ -69,7 +72,7 @@ export class ViewScore extends Component {
                         });
                         const starCountBreakdownRef = ref(
                             this.state.database,
-                            "scoreBreakdown/" + this.context.accounts[0]
+                            "scoreBreakdown/" + account
                         );
                         onValue(starCountBreakdownRef, async (snapshot) => {
                             try{
@@ -83,7 +86,7 @@ export class ViewScore extends Component {
                         });
                         const scoringProcessStatusRef = ref(
                             this.state.database,
-                            "scoringStatus/" + this.context.accounts[0]
+                            "scoringStatus/" + account
                         );
                         onValue(scoringProcessStatusRef, async (snapshot) => {
                             try{
@@ -159,12 +162,15 @@ export class ViewScore extends Component {
                 </Col>
             )
         }
-
-
     }
 
     render () {
         let { scores, status, scoringProcessStatus } = this.state;
+        window.ethereum.on('accountsChanged', (accounts) => {
+            if(accounts[0] !== undefined) {
+                this.fetchScore(accounts[0].toLowerCase())
+            }
+        });
         if(scores !== null) {
             return (
                 <Container style={{textAlign: "left"}} fluid>
@@ -205,10 +211,11 @@ export class ViewScore extends Component {
                 <div id="app" style={{ borderStyle: "none", padding: "20%" }}>
                     <Container className="justify-content-center">
                         <Row className="justify-content-center align-items-center">
-                            <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
-                                Oops! <br/> An error occured.
-                            </h4>
+                                <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
+                                    Oops! <br/> An error occured.
+                                </h4>
                         </Row>
+                        <Button style={{backgroundColor: 'rgba(0, 0, 0, 1)', borderRadius: '0', border: '0'}} href='/score'>Try again</Button>
                     </Container>
                 </div>
             )

@@ -7,7 +7,8 @@ import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../../Context/BlockchainContext";
 import getNFTScore from "../../helpers/score"
 import mintNFT from "../../helpers/sign"
-
+import NFTPass from '../../contracts/NFTPassABI.json'
+import config from "../../config";
 export class MintNFTPass extends Component {
 
     static contextType = BlockchainContext;
@@ -34,44 +35,54 @@ export class MintNFTPass extends Component {
             app: null,
             database: null,
             text: '',
-            pinata_api_key: '9abc6e0558f2d596f696',
-            pinata_secret_api_key: 'af50e53805c94dfa4b6bd3ddb85eadb5898704a5c17577b5651cf968e441cdec'
         }
-        
+        this.fetchScore = this.fetchScore.bind(this);
     }
 
     async componentDidMount() {
+        const accounts = await this.context.web3.eth.getAccounts()
+        if(accounts[0] !== undefined) {
+            const contract = new this.context.web3.eth.Contract(
+                NFTPass,
+                config.contract_address
+            )
+            const account = accounts[0].toLowerCase() 
+            this.fetchScore(account, contract)
+        }
+    }
+
+    async fetchScore(account, contract) {
         this.state.app = initializeApp(this.state.firebaseConfig);
 
         this.state.database = getDatabase(this.state.app);
-        const balance = await this.context.contract.methods.balanceOf(this.context.accounts[0]).call({from: this.context.accounts[0]})
+        const balance = await contract.methods.balanceOf(account).call()
         try {
-            const address = this.context.accounts[0];
+            const address = account;
             const response = await getNFTScore(address);
             await response.json().then(async (res) => {
                 if (res.success) {
                     const starCountRef = ref(
                         this.state.database,
-                        "score/" + this.context.accounts[0]
+                        "score/" + account
                     );
                     onValue(starCountRef, async (snapshot) => {
                         try{
                             const data = await snapshot.val();
                             this.setState({ scores: data.score });
-                            const address = this.context.accounts[0];
+                            const address = account;
                             const signature = await mintNFT(address);
                             if(balance == 0) {
                                 this.setState({text: 'minting new nft', scoreProgress: "progress"})
                                     try {
                                         console.log(signature.score)
-                                        await this.context.contract.methods
+                                        contract.methods
                                             .mint(
                                                 signature.messageHash,
                                                 signature.signature,
                                                 signature.nonce,
                                                 signature.score
                                             )
-                                            .send({ from: this.context.accounts[0], value: 0 })
+                                            .send({ from: account, value: 0 })
                                             .then((res) => {
                                                 this.setState({
                                                     txHash: res.transactionHash,
@@ -85,14 +96,14 @@ export class MintNFTPass extends Component {
                             } else if( balance == 1) {
                                 this.setState({text: 'updating current nft', scoreProgress: "progress"})
                                 try {
-                                    await this.context.contract.methods
+                                    contract.methods
                                         .updateScore(
                                             signature.messageHash,
                                             signature.signature,
                                             signature.nonce,
                                             signature.score
                                         )
-                                        .send({ from: this.context.accounts[0], value: 0 })
+                                        .send({ from: account, value: 0 })
                                         .then((res) => {
                                             this.setState({
                                                 txHash: res.transactionHash,

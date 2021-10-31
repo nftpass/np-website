@@ -33,6 +33,13 @@ export class NavComp extends Component {
                       <Nav.Link
                           style={{ color: "black" }}
                           className="navlink"
+                          href="/mint"
+                      >
+                          Mint
+                      </Nav.Link>
+                      <Nav.Link
+                          style={{ color: "black" }}
+                          className="navlink"
                           href="/leaderboard"
                       >
                           Leaderboard
