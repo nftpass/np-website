@@ -23,17 +23,22 @@ export class RankScore extends Component {
 
     async componentDidMount() {
         try {
-            const userAddress = this.context && this.context.accounts[0];
-            const rank = await getRank();
-            console.log(rank)
-            const percentile = await getAddressPercentile(userAddress);
-            console.log(percentile)
-            this.setState({
-                rank:rank,
-                percentile:percentile,
-                loading: false,
-                error: false
-            });
+            const accounts = await this.context.web3.eth.getAccounts()
+            if(accounts[0] !== undefined) {
+                const account = accounts[0].toLowerCase()
+                this.setState({account})
+                const rank = await getRank();
+                const percentile = await getAddressPercentile(account);
+                this.setState({
+                    rank:rank,
+                    percentile:percentile,
+                    loading: false,
+                    error: false
+                });
+            }
+
+
+
 
         } catch (e) {
             this.setState({
@@ -44,7 +49,7 @@ export class RankScore extends Component {
     }
 
     renderAddressRow(address, index, userAddressShort){
-        const isUser = address && address.address == userAddressShort;
+        const isUser = address && address.address === userAddressShort;
         const cssClasses = isUser ? 'user-address' : '';
         return (
             <tr className={cssClasses}>
