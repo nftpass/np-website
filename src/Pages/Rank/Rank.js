@@ -25,7 +25,9 @@ export class RankScore extends Component {
         try {
             const userAddress = this.context && this.context.accounts[0];
             const rank = await getRank();
+            console.log(rank)
             const percentile = await getAddressPercentile(userAddress);
+            console.log(percentile)
             this.setState({
                 rank:rank,
                 percentile:percentile,
