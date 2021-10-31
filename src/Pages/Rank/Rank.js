@@ -16,9 +16,9 @@ export class RankScore extends Component {
         this.state = {
             rank: undefined,
             loading:true,
-            error:false
+            error:false,
+            account: null
         }
-
     }
 
     async componentDidMount() {
@@ -56,7 +56,7 @@ export class RankScore extends Component {
     }
 
     render () {
-        const userAddress = this.context && this.context.accounts[0];
+        const userAddress = this.context && this.state.account;
         const userAddressShort = shortenAddress(userAddress);
         let {rank, percentile, error, loading} = this.state;
         rank = rank || [];
@@ -65,7 +65,7 @@ export class RankScore extends Component {
                 <Container className="justify-content-center">
                     {
                         loading && (
-                            <Row className="justify-content-center align-items-center">
+                            <Row className="justify-content-center align-items-center" style={{paddingTop: '20%'}}>
                                 <Spinner size='200%' animation="border" role="status"/>
                             </Row>
                         )
