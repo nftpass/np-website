@@ -5,8 +5,8 @@ import Web3 from "web3";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../../Context/BlockchainContext";
-import getNFTScore from "../../helpers/score.js"
-
+import getNFTScore from "../../helpers/score.js";
+import isCachedScoreValid from "../../helpers/validCache.js";
 export class ViewScore extends Component {
 
     static contextType = BlockchainContext;
@@ -34,26 +34,31 @@ export class ViewScore extends Component {
             app: null,
             database: null
         }
-        
+        this.fetchScore = this.fetchScore.bind(this);
     }
 
     async componentDidMount() {
+            const accounts = await this.context.web3.eth.getAccounts()
+            if(accounts[0] !== undefined) {
+                const account = accounts[0].toLowerCase() 
+                this.fetchScore(account)
+            }
+    }
+
+    async fetchScore(account) {
         this.state.app = initializeApp(this.state.firebaseConfig);
 
         this.state.database = getDatabase(this.state.app);
-       
+        
         try {
-            // this.setState({loaderText: <>Calculating your score! <br/> this will take a minute...</>})
-            const address = this.context && this.context.accounts[0];
-
-            const response = await getNFTScore(address);
+            const response = await getNFTScore(account);
 
             await response.json().then(async (res) => {
                 if (res.success) {
                     try{
                         const starCountRef = ref(
                             this.state.database,
-                            "score/" + this.context.accounts[0]
+                            "score/" + account
                         );
                         onValue(starCountRef, async (snapshot) => {
                             try{
@@ -67,16 +72,29 @@ export class ViewScore extends Component {
                         });
                         const starCountBreakdownRef = ref(
                             this.state.database,
-                            "scoreBreakdown/" + this.context.accounts[0]
+                            "scoreBreakdown/" + account
                         );
                         onValue(starCountBreakdownRef, async (snapshot) => {
                             try{
                                 const data = await snapshot.val();
-                                console.log(data)
                                 this.setState({ scoreBreakdown: data });
                             } catch (e) {
                                 console.log(e)
                                 console.log('Error when getting Firebase score breakdown')
+                                this.setState({scoreProgress: 'error'})
+                            }
+                        });
+                        const scoringProcessStatusRef = ref(
+                            this.state.database,
+                            "scoringStatus/" + account
+                        );
+                        onValue(scoringProcessStatusRef, async (snapshot) => {
+                            try{
+                                const data = await snapshot.val();
+                                this.setState({ scoringProcessStatus: data });
+                            } catch (e) {
+                                console.log(e)
+                                console.log('Error when getting Firebase scoring proccess status')
                                 this.setState({scoreProgress: 'error'})
                             }
                         });
@@ -102,7 +120,7 @@ export class ViewScore extends Component {
         let lastUpdate = new Date(scoreBreakdown.last_updated);
         scoreBreakdown = scoreBreakdown.scoreComponents;
         // only show if udpated sccore is fresher than 2 hours
-        const show = scoreBreakdown && scoreBreakdown.length > 0 && Math.abs(new Date() - lastUpdate) / 36e5*2 < 2;
+        const show = scoreBreakdown && scoreBreakdown.length > 0 && isCachedScoreValid(lastUpdate);
         if(show) {
             return (
                 <Col className='p-5'>
@@ -144,12 +162,16 @@ export class ViewScore extends Component {
                 </Col>
             )
         }
-
-
     }
 
     render () {
-        if(this.state.scores !== null) {
+        let { scores, status, scoringProcessStatus } = this.state;
+        window.ethereum.on('accountsChanged', (accounts) => {
+            if(accounts[0] !== undefined) {
+                this.fetchScore(accounts[0].toLowerCase())
+            }
+        });
+        if(scores !== null) {
             return (
                 <Container style={{textAlign: "left"}} fluid>
                     <Row className="justify-content-center align-items-center">
@@ -162,7 +184,7 @@ export class ViewScore extends Component {
                                                 <img style={{minWidth: '100%', height: 'auto', border: '5px solid black'}} src='frame.png'></img>
                                                 <div className="imagecenter align-items-center">
                                                     <img src='logo.svg' width='20%' />
-                                                    <h1 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '15px'}}>{this.state.scores}</h1>
+                                                    <h1 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '15px'}}>{scores}</h1>
                                                     <p style={{ fontFamily: 'Inter', fontWeight: '700'}}>POINTS</p>
                                                 </div>
                                                 <h6 className='fixed-bottom' style={{position: "absolute", bottom: '3px', fontFamily: 'Inter', fontWeight: '700', fontSize: '0.7em'}}>NFTPASS.XYZ</h6>
@@ -174,6 +196,11 @@ export class ViewScore extends Component {
                                     </Col>
                                     {this.renderBreakdown()}
                                 </Row>
+                                <Row className="align-items-center">
+                                    <Col className='p-5 see-leaderboard'>
+                                        <a href="/leaderboard">See where you are in the leaderboard</a>
+                                    </Col>
+                                </Row>
                             </Container>
                         </div>
                     </Row>
@@ -184,10 +211,11 @@ export class ViewScore extends Component {
                 <div id="app" style={{ borderStyle: "none", padding: "20%" }}>
                     <Container className="justify-content-center">
                         <Row className="justify-content-center align-items-center">
-                            <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
-                                Oops! <br/> An error occured.
-                            </h4>
+                                <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
+                                    Oops! <br/> An error occured.
+                                </h4>
                         </Row>
+                        <Button style={{backgroundColor: 'rgba(0, 0, 0, 1)', borderRadius: '0', border: '0'}} href='/score'>Try again</Button>
                     </Container>
                 </div>
             )
@@ -200,7 +228,7 @@ export class ViewScore extends Component {
                         </Row>
                         <Row className="justify-content-center align-items-center">
                             <h4 style={{ fontFamily: 'Inter', fontWeight: '700', paddingTop: '10px', textAlign: 'center' }}>
-                                Calculating your score! <br /> this will take a few seconds...
+                                {scoringProcessStatus && scoringProcessStatus.status + '...'} <br /> this will take a few seconds...
                             </h4>
                         </Row>
                     </Container>

@@ -5,6 +5,4 @@ const config = {
     google_analytics: process.env.REACT_APP_GOOGLE_ANALYTICS || "G-TWE1F7Y03G"
 }
 
-console.log(config)
-
 export default config;

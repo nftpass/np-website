@@ -2,6 +2,8 @@ import Button from "@restart/ui/esm/Button";
 import { Component } from "react";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import BlockchainContext from "../Context/BlockchainContext";
+import shortenAddress from "../helpers/address";
+
 export class NavComp extends Component {
 
     static contextType = BlockchainContext;
@@ -28,6 +30,20 @@ export class NavComp extends Component {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                   <Nav className="ml-auto">
+                      <Nav.Link
+                          style={{ color: "black" }}
+                          className="navlink"
+                          href="/mint"
+                      >
+                          Mint
+                      </Nav.Link>
+                      <Nav.Link
+                          style={{ color: "black" }}
+                          className="navlink"
+                          href="/leaderboard"
+                      >
+                          Leaderboard
+                      </Nav.Link>
                     <Nav.Link
                       style={{ color: "black" }}
                       className="navlink"
@@ -42,7 +58,9 @@ export class NavComp extends Component {
                     >
                       Contract
                     </Nav.Link>
-                    <Button className='border-0 w-100' style={{borderRadius: '0rem', backgroundColor: 'rgba(0,0,0,0)',  color: 'black', fontFamily: 'Inter', fontWeight: '700', padding: '0px 10px 0px 10px'}} disabled={true}>{account}</Button>
+                    <Button className='border-0 w-100' style={{borderRadius: '0rem', backgroundColor: 'rgba(0,0,0,0)',  color: 'black', fontFamily: 'Inter', fontWeight: '700', padding: '0px 10px 0px 10px'}} disabled={true}>
+                        {shortenAddress(account)}
+                    </Button>
                   </Nav>
                 </Navbar.Collapse>
               </Container>
