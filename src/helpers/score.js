@@ -6,7 +6,7 @@ const getNFTScore = async (address) => {
         return
     }
     return fetch(
-        `${config.backend_endpoint}/get_score/${address}`
+        `${config.backend_endpoint}/get_score/${address.toLowerCase()}`
     );
 }
 
