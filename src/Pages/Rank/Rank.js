@@ -36,16 +36,46 @@ export class RankScore extends Component {
                     error: false
                 });
             }
-
-
-
-
         } catch (e) {
             this.setState({
                 error: 'Bug fetching rank or percentile',
                 loading:false
             })
         }
+    }
+
+    renderAddressPositionInPopulation(){
+        let {percentile} = this.state;
+        if(!percentile){
+            return
+        }
+        const numOfLargerScores = percentile.numOfLargerScores;
+        const totalScores = percentile.totalScores;
+        const score = percentile.score;
+        percentile = percentile.percentile;
+        percentile = 100 - percentile;
+        let percentileText;
+        if(score === 0){
+            percentileText = `Your score was 0.`;
+        } else {
+            if(numOfLargerScores === 0)
+                percentileText = `You are the top score!`;
+            else if(percentile < 50) {
+                percentile = (5 - percentile % 5) + percentile;
+                percentileText = `You are in the top ${percentile}%!`;
+            } else {
+                percentile = 100 - percentile;
+                percentile = (5 - percentile % 5) + percentile;
+                percentileText = `You are in the bottom ${percentile}%!`;
+            }
+        }
+
+
+        return (
+            <Row className="justify-content-center align-items-center percentile-row">
+                <p>{percentileText}</p>
+            </Row>
+        )
     }
 
     renderAddressRow(address, index, userAddressShort){
@@ -80,6 +110,7 @@ export class RankScore extends Component {
                     {
                         !loading && (
                             <div>
+                                {this.renderAddressPositionInPopulation()}
                                 <Row className="justify-content-center align-items-center">
                                     <Table>
                                         <thead>
@@ -96,12 +127,6 @@ export class RankScore extends Component {
                                         </tbody>
                                     </Table>
                                 </Row>
-                                {
-                                    percentile &&
-                                    <Row className="justify-content-center align-items-center percentile-row">
-                                        <p>You are in the <b> {percentile.percentile}</b> percentile.</p>
-                                    </Row>
-                                }
                             </div>
                         )
                     }
