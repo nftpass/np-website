@@ -1,4 +1,4 @@
-const cacheTimeValidity = 60*60*1000*2; //in hours (2 hours); expressed in milliseconds
+const cacheTimeValidity = 60*1000; //in hours (1 min); expressed in milliseconds
 
 
 const isCachedScoreValid = (lastUpdate) => {

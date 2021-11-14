@@ -7,6 +7,9 @@ import { getDatabase, ref, onValue} from "firebase/database";
 import BlockchainContext from "../../Context/BlockchainContext";
 import getNFTScore from "../../helpers/score.js";
 import isCachedScoreValid from "../../helpers/validCache.js";
+
+
+
 export class ViewScore extends Component {
 
     static contextType = BlockchainContext;
@@ -20,6 +23,7 @@ export class ViewScore extends Component {
             networkId: null,
             web3: new Web3(window.ethereum),
             spinner: true,
+            loadingBreakdown: true,
             contract: null,
             firebaseConfig: {
                 apiKey: "AIzaSyAEaknNq7Hcxffpma9NezdSTj1e2S4VuPE",
@@ -63,7 +67,10 @@ export class ViewScore extends Component {
                         onValue(starCountRef, async (snapshot) => {
                             try{
                                 const data = await snapshot.val();
-                                this.setState({ scores: data && data.score });
+                                const lastUpdate = new Date(data.last_updated)
+                                if (isCachedScoreValid(lastUpdate)){
+                                    this.setState({ scores: data && data.score });
+                                }
                             } catch (e) {
                                 console.log('Error when getting Firebase score value')
                                 console.log(e)
@@ -77,11 +84,20 @@ export class ViewScore extends Component {
                         onValue(starCountBreakdownRef, async (snapshot) => {
                             try{
                                 const data = await snapshot.val();
-                                this.setState({ scoreBreakdown: data });
+                                const lastUpdate = new Date(data.last_updated)
+                                if (isCachedScoreValid(lastUpdate)){
+                                    this.setState({
+                                        scoreBreakdown: data,
+                                        loadingBreakdown: false
+                                    });
+                                }
                             } catch (e) {
                                 console.log(e)
                                 console.log('Error when getting Firebase score breakdown')
-                                this.setState({scoreProgress: 'error'})
+                                this.setState({
+                                    scoreProgress: 'error',
+                                    loadingBreakdown: false
+                                })
                             }
                         });
                         const scoringProcessStatusRef = ref(
@@ -91,7 +107,10 @@ export class ViewScore extends Component {
                         onValue(scoringProcessStatusRef, async (snapshot) => {
                             try{
                                 const data = await snapshot.val();
-                                this.setState({ scoringProcessStatus: data });
+                                const lastUpdate = new Date(data.last_updated)
+                                if (isCachedScoreValid(lastUpdate)){
+                                    this.setState({ scoringProcessStatus: data });
+                                }
                             } catch (e) {
                                 console.log(e)
                                 console.log('Error when getting Firebase scoring proccess status')
@@ -113,8 +132,60 @@ export class ViewScore extends Component {
         }
     }
 
+    renderElementInBreakdown(breakdown){
+        console.log(breakdown)
+        if (breakdown.points > 0) {
+            if (breakdown.type == 'collection') {
+                return (
+                    <div className='score-component collection' key={breakdown.contractAddress + '_collection'}>
+                        <div>
+                            <div className="score-component-text">{breakdown.collectionName} collection score</div>
+                            <div className="points points-piece">+{breakdown.points}</div>
+                        </div>
+                    </div>
+                )
+            } else if (breakdown.type == 'piece') {
+                let pieceText = `${breakdown.collectionName} - id: ${breakdown.pieceID}`
+                if(breakdown.data){
+                    const rank = breakdown.data.rank;
+                    pieceText += rank ? ` | rank: ${rank}` : ''
+                }
+                return (
+                    <div className='score-component collection-piece' key={breakdown.contractAddress + '_' + breakdown.pieceID}>
+                        <div>
+                            <div className="score-component-text">{pieceText}</div>
+                            <div className="points points-collection">+{breakdown.points}</div>
+                        </div>
+                    </div>
+                )
+            } else if ((breakdown.type == 'all_pieces')) {
+                return (
+                    <div className='score-component collection-all-pieces' key={breakdown.collectionName + '_all_pieces'}>
+                        <div>
+                            <div className="score-component-text">{breakdown.collectionName} all pieces score</div>
+                            <div className="points points-all-pieces">+{breakdown.points}</div>
+                        </div>
+                    </div>
+                )
+            }
+        }
+
+
+    }
+
     renderBreakdown(){
-        let { scoreBreakdown } = this.state;
+        let { scoreBreakdown, loadingBreakdown } = this.state;
+        if(loadingBreakdown){
+            return (
+                <Col className='p-5'>
+                    <div className='score-breakdown'>
+                        <div className='spinner-wrapper'>
+                            <Spinner size='200%' animation="border" role="status"/>
+                        </div>
+                    </div>
+                </Col>
+            )
+        }
         if (!scoreBreakdown)
             return
         let lastUpdate = new Date(scoreBreakdown.last_updated);
@@ -127,36 +198,8 @@ export class ViewScore extends Component {
                     <div className='score-breakdown'>
                         <p className="score-breakdown-title">What's in the score?</p>
                         {scoreBreakdown.map((breakdown) => {
-                            if (breakdown.points > 0) {
-                                if (breakdown.type == 'collection') {
-                                    return (
-                                        <div className='score-component collection' key={breakdown.contractAddress + '_collection'}>
-                                            <div>
-                                                <div className="score-component-text">{breakdown.collectionName} collection score</div>
-                                                <div className="points points-piece">+{breakdown.points}</div>
-                                            </div>
-                                        </div>
-                                    )
-                                } else if (breakdown.type == 'piece') {
-                                    return (
-                                        <div className='score-component collection-piece' key={breakdown.contractAddress + '_' + breakdown.pieceID}>
-                                            <div>
-                                                <div className="score-component-text">{breakdown.collectionName} - {breakdown.pieceID}</div>
-                                                <div className="points points-collection">+{breakdown.points}</div>
-                                            </div>
-                                        </div>
-                                    )
-                                } else if ((breakdown.type == 'all_pieces')) {
-                                    return (
-                                        <div className='score-component collection-all-pieces' key={breakdown.collectionName + '_all_pieces'}>
-                                            <div>
-                                                <div className="score-component-text">{breakdown.collectionName} all pieces score</div>
-                                                <div className="points points-all-pieces">+{breakdown.points}</div>
-                                            </div>
-                                        </div>
-                                    )
-                                }
-                            }
+                            return this.renderElementInBreakdown(breakdown)
+
                         })}
                     </div>
                 </Col>

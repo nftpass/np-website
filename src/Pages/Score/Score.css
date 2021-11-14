@@ -53,6 +53,12 @@
     display: inline-block;
 }
 
+.spinner-wrapper
+{
+    margin-top:120px;
+    text-align:center;
+}
+
 .points {
     position: relative;
     display: inline;
